@@ -25,6 +25,11 @@ config :tailwind,
     cd: Path.expand("../assets", __DIR__)
   ]
 
+config :uptime, Oban,
+  engine: Oban.Engines.Basic,
+  queues: [default: 10],
+  repo: Uptime.Repo
+
 config :uptime, Uptime.Repo,
   migration_primary_key: [type: :text],
   migration_timestamps: [type: :utc_datetime_usec]

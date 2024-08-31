@@ -12,6 +12,7 @@ defmodule Uptime.Application do
       Uptime.Repo,
       {Phoenix.PubSub, name: Uptime.PubSub},
       Uptime.RequestTracer.Client,
+      {Oban, Application.fetch_env!(:uptime, Oban)},
       UptimeWeb.Endpoint
     ]
 

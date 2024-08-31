@@ -24,6 +24,7 @@ defmodule Uptime.Service do
     field :expected_status_code, :string
     field :expected_response_body, :string
     field :interval_ms, :integer
+    field :enabled, :boolean, default: true
 
     timestamps()
   end
@@ -36,7 +37,8 @@ defmodule Uptime.Service do
       :url,
       :expected_status_code,
       :expected_response_body,
-      :interval_ms
+      :interval_ms,
+      :enabled
     ])
     |> validate_required([
       :name,

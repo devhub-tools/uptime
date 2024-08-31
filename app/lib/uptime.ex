@@ -18,4 +18,8 @@ defmodule Uptime do
     |> Uptime.Check.changeset()
     |> Uptime.Repo.insert!()
   end
+
+  def get_service(id) do
+    Uptime.Repo.get(Uptime.Service, id)
+  end
 end
