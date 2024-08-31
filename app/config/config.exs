@@ -9,7 +9,11 @@ import Config
 
 config :uptime,
   ecto_repos: [Uptime.Repo],
-  generators: [timestamp_type: :utc_datetime, binary_id: true]
+  generators: [timestamp_type: :utc_datetime_usec, binary_id: true]
+
+config :uptime, Uptime.Repo,
+  migration_primary_key: [type: :text],
+  migration_timestamps: [type: :utc_datetime_usec]
 
 # Configures the endpoint
 config :uptime, UptimeWeb.Endpoint,
