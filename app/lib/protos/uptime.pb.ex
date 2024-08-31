@@ -1,4 +1,5 @@
 defmodule DevhubProtos.Uptime.V1.CheckRequest do
+  @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   field :url, 1, type: :string
@@ -6,6 +7,7 @@ defmodule DevhubProtos.Uptime.V1.CheckRequest do
 end
 
 defmodule DevhubProtos.Uptime.V1.CheckResponse do
+  @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   field :dns, 1, type: :int32
@@ -18,11 +20,13 @@ defmodule DevhubProtos.Uptime.V1.CheckResponse do
 end
 
 defmodule DevhubProtos.Uptime.V1.UptimeService.Service do
+  @moduledoc false
   use GRPC.Service, name: "uptime.v1.UptimeService", protoc_gen_elixir_version: "0.12.0"
 
-  rpc :Check, DevhubProtos.Uptime.V1.CheckRequest, DevhubProtos.Uptime.V1.CheckResponse
+  rpc(:Check, DevhubProtos.Uptime.V1.CheckRequest, DevhubProtos.Uptime.V1.CheckResponse)
 end
 
 defmodule DevhubProtos.Uptime.V1.UptimeService.Stub do
+  @moduledoc false
   use GRPC.Stub, service: DevhubProtos.Uptime.V1.UptimeService.Service
 end

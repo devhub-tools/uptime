@@ -8,7 +8,7 @@ defmodule Uptime.Repo.Migrations.CreateServicesTable do
       add :url, :text
       add :expected_status_code, :text
       add :expected_response_body, :text
-      add :interval, :text
+      add :interval_ms, :integer
 
       timestamps()
     end

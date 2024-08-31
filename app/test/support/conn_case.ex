@@ -19,15 +19,14 @@ defmodule UptimeWeb.ConnCase do
 
   using do
     quote do
+      use UptimeWeb, :verified_routes
+      import Phoenix.ConnTest
+      import Plug.Conn
+      import UptimeWeb.ConnCase
       # The default endpoint for testing
       @endpoint UptimeWeb.Endpoint
 
-      use UptimeWeb, :verified_routes
-
       # Import conveniences for testing with connections
-      import Plug.Conn
-      import Phoenix.ConnTest
-      import UptimeWeb.ConnCase
     end
   end
 

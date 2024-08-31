@@ -41,6 +41,7 @@ defmodule Uptime.MixProject do
       {:google_protos, "~> 0.1"},
       {:grpc, "~> 0.6"},
       {:jason, "~> 1.2"},
+      {:oban, "~> 2.17"},
       {:phoenix_ecto, "~> 4.5"},
       {:phoenix_html, "~> 4.1"},
       {:phoenix_live_dashboard, "~> 0.8.3"},
@@ -49,17 +50,13 @@ defmodule Uptime.MixProject do
       {:phoenix, "~> 1.7.14"},
       {:postgrex, ">= 0.0.0"},
       {:protobuf, "~> 0.12"},
+      {:styler, "~> 1.0.0-rc.1", only: [:dev, :test], runtime: false},
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:uxid, "~> 0.2"},
       {:heroicons,
-       github: "tailwindlabs/heroicons",
-       tag: "v2.1.1",
-       sparse: "optimized",
-       app: false,
-       compile: false,
-       depth: 1}
+       github: "tailwindlabs/heroicons", tag: "v2.1.1", sparse: "optimized", app: false, compile: false, depth: 1}
     ]
   end
 

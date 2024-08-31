@@ -1,4 +1,5 @@
 defmodule Uptime.Check do
+  @moduledoc false
   use Uptime.Schema
 
   import Ecto.Changeset

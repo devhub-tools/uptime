@@ -1,4 +1,5 @@
 defmodule Uptime.Service do
+  @moduledoc false
   use Uptime.Schema
 
   import Ecto.Changeset
@@ -10,7 +11,7 @@ defmodule Uptime.Service do
           url: String.t(),
           expected_status_code: String.t(),
           expected_response_body: String.t(),
-          interval: String.t(),
+          interval_ms: integer(),
           inserted_at: DateTime.t(),
           updated_at: DateTime.t()
         }
@@ -22,7 +23,7 @@ defmodule Uptime.Service do
     field :url, :string
     field :expected_status_code, :string
     field :expected_response_body, :string
-    field :interval, :string
+    field :interval_ms, :integer
 
     timestamps()
   end
@@ -35,7 +36,7 @@ defmodule Uptime.Service do
       :url,
       :expected_status_code,
       :expected_response_body,
-      :interval
+      :interval_ms
     ])
     |> validate_required([
       :name,
@@ -43,7 +44,7 @@ defmodule Uptime.Service do
       :url,
       :expected_status_code,
       :expected_response_body,
-      :interval
+      :interval_ms
     ])
   end
 end
