@@ -1,3 +1,4 @@
 {
-  "elixirLS.projectDir": "app"
+  "elixirLS.projectDir": "app",
+  "lexical.server.projectDir": "./app"
 }
