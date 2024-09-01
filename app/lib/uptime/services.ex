@@ -58,7 +58,7 @@ defmodule Uptime.Services do
         nil
 
       checks ->
-        checks |> Enum.max_by(& &1.inserted_at) |> Map.get(field)
+        checks |> Enum.at(0) |> Map.get(field)
     end
   end
 end
