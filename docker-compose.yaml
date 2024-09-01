@@ -1,0 +1,83 @@
+---
+version: "3.7"
+
+name: uptime
+
+services:
+  traefik:
+    image: traefik:v3.0
+    restart: unless-stopped
+    command:
+      - --log.level=DEBUG
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+    ports:
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.traefik-dashboard.rule: Host(`traefik.uptime.arpa`)
+      traefik.http.routers.traefik-dashboard.service: traefik-dashboard-service
+      traefik.http.routers.traefik-dashboard.entrypoints: web
+      traefik.http.services.traefik-dashboard-service.loadbalancer.server.port: 8080
+
+  app:
+    depends_on:
+      - postgres
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    deploy:
+      replicas: 1
+    environment:
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      SERVER_URL: http://uptime.arpa
+      ENVIRONMENT: development
+      DEPLOY_CONTEXT: development
+    env_file:
+      - ./app/.env
+    volumes:
+      - ./app:/app
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.app.rule: Host(`uptime.arpa`)
+      traefik.http.routers.app.entrypoints: web
+      traefik.http.services.app.loadbalancer.server.port: 4000
+
+  request-tracer:
+    build:
+      context: ./request_tracer
+      dockerfile: Dockerfile
+
+  toxiproxy:
+    image: ghcr.io/shopify/toxiproxy:2.9.0
+    restart: unless-stopped
+    ports:
+      - 8474:8474
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.toxiproxy.rule: Host(`toxiproxy.uptime.arpa`)
+      traefik.http.routers.toxiproxy.service: toxiproxy-service
+      traefik.http.routers.toxiproxy.entrypoints: web
+      traefik.http.services.toxiproxy.loadbalancer.server.port: 8474
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME:-uptime}
+      POSTGRES_USER: ${DATABASE_USER:-postgres}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-postgres}
+      PGOPTIONS: -c log_statement=all
+      PGDATA: /var/lib/postgresql/data
+    env_file:
+      - ./app/.env
+    ports:
+      - ${DATABASE_PORT:-5432}:5432
+    volumes:
+      - ./docker/data/postgres:/var/lib/postgresql/data
