@@ -56,7 +56,8 @@ defmodule Uptime.MixProject do
       {:telemetry_poller, "~> 1.0"},
       {:uxid, "~> 0.2"},
       {:heroicons,
-       github: "tailwindlabs/heroicons", tag: "v2.1.1", sparse: "optimized", app: false, compile: false, depth: 1}
+       github: "tailwindlabs/heroicons", tag: "v2.1.1", sparse: "optimized", app: false, compile: false, depth: 1},
+      {:wasmex, "~> 0.9"}
     ]
   end
 
