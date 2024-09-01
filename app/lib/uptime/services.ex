@@ -9,11 +9,32 @@ defmodule Uptime.Services do
   alias Uptime.Repo
   alias Uptime.Service
 
-  @list_default_opts %{enabled: true, checks_since: nil}
+  @default_opts %{enabled: true, checks_since: nil}
 
+  @doc """
+  Get the service by its ID.
+
+  TODO: I think we should make 'name' unique and get the service by the name in the link.
+  Then in the config file we could use the name as the key for the config definition.
+  """
+  @spec get!(String.t(), Keyword.t()) :: Service.t()
+  def get!(id, opts \\ []) do
+    %{enabled: enabled, checks_since: checks_since} = Enum.into(opts, @default_opts)
+
+    Service
+    |> from()
+    |> where([s], s.id == ^id)
+    |> maybe_where(:enabled, enabled)
+    |> maybe_preload(:checks_since, checks_since)
+    |> Repo.one!()
+  end
+
+  @doc """
+  List all services.
+  """
   @spec list(Keyword.t()) :: [Service.t()]
   def list(opts \\ []) do
-    %{enabled: enabled, checks_since: checks_since} = Enum.into(opts, @list_default_opts)
+    %{enabled: enabled, checks_since: checks_since} = Enum.into(opts, @default_opts)
 
     Service
     |> from()
@@ -23,14 +44,14 @@ defmodule Uptime.Services do
   end
 
   @spec maybe_where(Ecto.Query.t(), atom(), any()) :: Ecto.Query.t()
-  defp maybe_where(query, :enabled, condition) do
+  defp maybe_where(query, :enabled, condition) when not is_nil(condition) do
     where(query, [s], s.enabled == ^condition)
   end
 
   defp maybe_where(query, _opt, _value), do: query
 
   @spec maybe_preload(Ecto.Query.t(), atom(), any()) :: Ecto.Query.t()
-  defp maybe_preload(query, :checks_since, checks_since) do
+  defp maybe_preload(query, :checks_since, checks_since) when not is_nil(checks_since) do
     Check
     |> from()
     |> order_by([c], desc: c.inserted_at)
@@ -51,7 +72,7 @@ defmodule Uptime.Services do
         |> from()
         |> order_by([c], desc: c.inserted_at)
         |> limit(1)
-        |> then(&preload(service, checks: ^&1))
+        |> then(&Repo.preload(service, checks: &1))
         |> recent_check_field(field)
 
       [] ->

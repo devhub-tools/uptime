@@ -87,6 +87,7 @@ defmodule UptimeWeb do
       import UptimeWeb.AppComponents
       # Core UI components and translation
       import UptimeWeb.CoreComponents
+      import UptimeWeb.FormComponents
       import UptimeWeb.Gettext
 
       # Shortcut for generating JS commands
