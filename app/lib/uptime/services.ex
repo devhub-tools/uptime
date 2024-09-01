@@ -5,6 +5,7 @@ defmodule Uptime.Services do
 
   import Ecto.Query
 
+  alias Ecto.Association.NotLoaded
   alias Uptime.Check
   alias Uptime.Repo
   alias Uptime.Service
@@ -56,18 +57,19 @@ defmodule Uptime.Services do
     |> from()
     |> order_by([c], desc: c.inserted_at)
     |> where([c], c.inserted_at >= ^checks_since)
+    |> limit(50)
     |> then(&preload(query, checks: ^&1))
   end
 
   defp maybe_preload(query, _opt, _value), do: query
 
   @doc """
-  Returns most recent field on preloaded checks for a service.
+  Returns _most_ recent field on preloaded checks for a service.
   """
   @spec recent_check_field(Service.t(), atom()) :: Check.t() | nil
   def recent_check_field(%Service{} = service, field) do
     case service.checks do
-      %Ecto.Association.NotLoaded{} ->
+      %NotLoaded{} ->
         Check
         |> from()
         |> order_by([c], desc: c.inserted_at)
@@ -80,6 +82,28 @@ defmodule Uptime.Services do
 
       checks ->
         checks |> Enum.at(0) |> Map.get(field)
+    end
+  end
+
+  @doc """
+  Returns _least_ recent field on preloaded checks for a service.
+  """
+  @spec first_check_field(Service.t(), atom()) :: Check.t() | nil
+  def first_check_field(%Service{} = service, field) do
+    case service.checks do
+      %NotLoaded{} ->
+        Check
+        |> from()
+        |> order_by([c], desc: c.inserted_at)
+        |> limit(1)
+        |> then(&Repo.preload(service, checks: &1))
+        |> recent_check_field(field)
+
+      [] ->
+        nil
+
+      checks ->
+        checks |> Enum.reverse() |> Enum.at(0) |> Map.get(field)
     end
   end
 end

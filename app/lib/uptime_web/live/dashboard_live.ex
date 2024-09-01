@@ -35,7 +35,7 @@ defmodule UptimeWeb.DashboardLive do
         </.button>
       </:actions>
 
-      <div class="max-w-5xl px-4 mx-auto mt-6">
+      <div class="max-w-5xl mx-auto mt-6">
         <%= for service <- Services.list(enabled: true, checks_since: @show_checks_since) do %>
           <.service_checks_summary
             service={service}
@@ -54,6 +54,10 @@ defmodule UptimeWeb.DashboardLive do
       socket
       |> assign(show_checks_since: @show_checks_since)
       |> assign(show_checks_until: @show_checks_until)
+
+    # TODO: subscribe to changes in all service checks
+    # if connected?(socket) do
+    # end
 
     {:ok, socket}
   end

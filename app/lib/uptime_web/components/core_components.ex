@@ -22,6 +22,74 @@ defmodule UptimeWeb.CoreComponents do
   alias Phoenix.LiveView.JS
 
   @doc """
+  Render hover card wrapper
+  """
+  attr :class, :string, default: nil
+  attr :rest, :global
+  slot :inner_block, required: true
+
+  def hover_card(assigns) do
+    ~H"""
+    <div
+      class={[
+        "inline-block relative group/hover-card",
+        @class
+      ]}
+      {@rest}
+    >
+      <%= render_slot(@inner_block) %>
+    </div>
+    """
+  end
+
+  @doc """
+  Render hover card trigger
+  """
+  attr :class, :string, default: nil
+  attr :rest, :global
+  slot :inner_block
+
+  def hover_card_trigger(assigns) do
+    ~H"""
+    <button
+      class={[
+        "",
+        @class
+      ]}
+      {@rest}
+    >
+      <%= render_slot(@inner_block) %>
+    </button>
+    """
+  end
+
+  @doc """
+  Render hover card content
+  """
+  attr :id, :string, default: nil
+  attr :class, :string, default: nil
+  attr :rest, :global
+  slot :inner_block, required: true
+
+  def hover_card_content(assigns) do
+    ~H"""
+    <div
+      id={@id}
+      phx-hook="Tooltip"
+      class={[
+        "hovercard bg-white absolute hidden group-hover/hover-card:block",
+        "z-50 rounded-md border p-4 shadow-md outline-none",
+        @class
+      ]}
+      {@rest}
+    >
+      <%= render_slot(@inner_block) %>
+      <div class="arrow" data-popper-arrow></div>
+    </div>
+    """
+  end
+
+  @doc """
   Renders a modal.
 
   ## Examples

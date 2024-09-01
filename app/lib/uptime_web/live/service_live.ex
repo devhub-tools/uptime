@@ -34,12 +34,15 @@ defmodule UptimeWeb.ServiceLive do
         </.button>
       </:actions>
 
-      <div class="max-w-5xl px-4 mx-auto mt-6">
+      <div class="max-w-5xl mx-auto mt-6 space-y-6">
         <.service_checks_summary
           service={@service}
           window_started_at={@show_checks_since}
           window_ended_at={@show_checks_until}
         />
+        <div>
+          TODO: More details about the checks for this service...
+        </div>
       </div>
     </.app>
     """
@@ -51,6 +54,10 @@ defmodule UptimeWeb.ServiceLive do
       |> assign(show_checks_since: @show_checks_since)
       |> assign(show_checks_until: @show_checks_until)
       |> assign(service: Services.get!(id, enabled: true, checks_since: @show_checks_since))
+
+    # TODO: subscribe to changes in service checks
+    # if connected?(socket) do
+    # end
 
     {:ok, socket}
   end
