@@ -17,7 +17,7 @@ defmodule UptimeWeb.Router do
   scope "/", UptimeWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live "/", DashboardLive, :index
   end
 
   # Other scopes may use custom stacks.

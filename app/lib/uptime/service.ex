@@ -26,6 +26,8 @@ defmodule Uptime.Service do
     field :interval_ms, :integer
     field :enabled, :boolean, default: true
 
+    has_many :checks, Uptime.Check, preload_order: [desc: :inserted_at]
+
     timestamps()
   end
 

@@ -84,6 +84,7 @@ defmodule UptimeWeb do
     quote do
       # HTML escaping functionality
       import Phoenix.HTML
+      import UptimeWeb.AppComponents
       # Core UI components and translation
       import UptimeWeb.CoreComponents
       import UptimeWeb.Gettext

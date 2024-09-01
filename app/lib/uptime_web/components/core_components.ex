@@ -22,6 +22,34 @@ defmodule UptimeWeb.CoreComponents do
   alias Phoenix.LiveView.JS
 
   @doc """
+  Renders a app wrapper with header and main content.
+  """
+  attr :class, :string, default: nil
+  slot :inner_block, required: true
+  slot :actions
+
+  def app(assigns) do
+    ~H"""
+    <header class={[
+      "px-10 py-8",
+      @actions != [] && "flex items-center justify-between gap-6",
+      @class
+    ]}>
+      <div class="flex items-center space-x-2">
+        <.icon name="hero-check-badge" class="h-7 w-7 flex-none" />
+        <h1 class="text-lg font-semibold leading-8 text-zinc-800">
+          Uptime
+        </h1>
+      </div>
+      <div class="flex-none space-x-3"><%= render_slot(@actions) %></div>
+    </header>
+    <main class="flex-1">
+      <%= render_slot(@inner_block) %>
+    </main>
+    """
+  end
+
+  @doc """
   Renders a modal.
 
   ## Examples
@@ -413,31 +441,6 @@ defmodule UptimeWeb.CoreComponents do
       <.icon name="hero-exclamation-circle-mini" class="mt-0.5 h-5 w-5 flex-none" />
       <%= render_slot(@inner_block) %>
     </p>
-    """
-  end
-
-  @doc """
-  Renders a header with title.
-  """
-  attr :class, :string, default: nil
-
-  slot :inner_block, required: true
-  slot :subtitle
-  slot :actions
-
-  def header(assigns) do
-    ~H"""
-    <header class={[@actions != [] && "flex items-center justify-between gap-6", @class]}>
-      <div>
-        <h1 class="text-lg font-semibold leading-8 text-zinc-800">
-          <%= render_slot(@inner_block) %>
-        </h1>
-        <p :if={@subtitle != []} class="mt-2 text-sm leading-6 text-zinc-600">
-          <%= render_slot(@subtitle) %>
-        </p>
-      </div>
-      <div class="flex-none"><%= render_slot(@actions) %></div>
-    </header>
     """
   end
 

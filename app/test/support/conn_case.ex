@@ -20,6 +20,7 @@ defmodule UptimeWeb.ConnCase do
   using do
     quote do
       use UptimeWeb, :verified_routes
+
       import Phoenix.ConnTest
       import Plug.Conn
       import UptimeWeb.ConnCase
