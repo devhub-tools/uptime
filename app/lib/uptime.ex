@@ -1,19 +1,16 @@
 defmodule Uptime do
   @moduledoc false
-  @callback run_check(Uptime.Service.t()) :: Uptime.Check.t()
-  def run_check(service) do
-    %DevhubProtos.Uptime.V1.CheckResponse{} =
-      response = Uptime.RequestTracer.run_check(service.method, service.url)
-
+  @callback save_check(Uptime.Service.t()) :: Uptime.Check.t()
+  def save_check(service, result) do
     %{
       service: service,
-      status_code: response.status_code,
-      response_body: response.response_body,
-      dns_time: response.dns,
-      connect_time: response.connect,
-      tls_time: response.tls,
-      first_byte_time: response.first_byte,
-      request_time: response.complete
+      status_code: result.status_code,
+      response_body: result.response_body,
+      dns_time: result.dns_done,
+      connect_time: result.connected,
+      tls_time: result.tls_done,
+      first_byte_time: result.first_byte,
+      request_time: result.complete
     }
     |> Uptime.Check.changeset()
     |> Uptime.Repo.insert!()
