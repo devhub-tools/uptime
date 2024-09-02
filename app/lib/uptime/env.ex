@@ -2,16 +2,6 @@ defmodule Uptime.Env do
   @moduledoc """
   Uptime environment configuration.
   """
-
-  @spec deploy_context() :: atom
-  def deploy_context, do: Application.get_env(:uptime, :deploy_context)
-
-  @spec prod_context?() :: boolean()
-  def prod_context?, do: deploy_context() == :prod
-
-  @spec dev_context?() :: boolean()
-  def dev_context?, do: deploy_context() == :dev
-
   @spec build_version() :: String.t()
   def build_version, do: Application.get_env(:uptime, :build_version)
 

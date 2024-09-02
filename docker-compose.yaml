@@ -1,10 +1,8 @@
----
-version: "3.7"
-
 name: uptime
 
 services:
   traefik:
+    profiles: [full]
     image: traefik:v3.0
     restart: unless-stopped
     command:
@@ -25,6 +23,7 @@ services:
       traefik.http.services.traefik-dashboard-service.loadbalancer.server.port: 8080
 
   app:
+    profiles: [full]
     depends_on:
       - postgres
     build:
@@ -36,9 +35,8 @@ services:
     environment:
       DATABASE_HOST: postgres
       DATABASE_PORT: 5432
+      MIX_ENV: dev
       SERVER_URL: http://uptime.arpa
-      ENVIRONMENT: development
-      DEPLOY_CONTEXT: development
     env_file:
       - ./app/.env
     volumes:
@@ -50,11 +48,15 @@ services:
       traefik.http.services.app.loadbalancer.server.port: 4000
 
   request-tracer:
+    profiles: [minimal]
     build:
-      context: ./request_tracer
+      context: ./request-tracer
       dockerfile: Dockerfile
+    ports:
+      - 50051:50051
 
   toxiproxy:
+    profiles: [full]
     image: ghcr.io/shopify/toxiproxy:2.9.0
     restart: unless-stopped
     ports:
@@ -67,6 +69,7 @@ services:
       traefik.http.services.toxiproxy.loadbalancer.server.port: 8474
 
   postgres:
+    profiles: [full]
     image: postgres:16-alpine
     restart: unless-stopped
     environment:

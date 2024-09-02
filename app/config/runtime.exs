@@ -4,24 +4,6 @@ if System.get_env("PHX_SERVER") do
   config :uptime, UptimeWeb.Endpoint, server: true
 end
 
-deploy_context =
-  if config_env() == :test do
-    :test
-  else
-    "DEPLOY_CONTEXT"
-    |> System.get_env("development")
-    |> case do
-      "production" ->
-        :prod
-
-      _ ->
-        :dev
-    end
-  end
-
-config :uptime,
-  deploy_context: deploy_context
-
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||
