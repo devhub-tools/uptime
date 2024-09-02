@@ -21,13 +21,15 @@ defmodule UptimeWeb.ConnCase do
     quote do
       use UptimeWeb, :verified_routes
 
+      import Hammox
       import Phoenix.ConnTest
       import Plug.Conn
+      import Uptime.Factory
       import UptimeWeb.ConnCase
-      # The default endpoint for testing
+
       @endpoint UptimeWeb.Endpoint
 
-      # Import conveniences for testing with connections
+      setup :verify_on_exit!
     end
   end
 
