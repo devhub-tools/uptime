@@ -1,3 +1,9 @@
+# Local docker storage
+/docker/data
+
+# Configuration
+.env
+
 # The directory Mix will write compiled artifacts to.
 /_build/
 
@@ -34,4 +40,3 @@ uptime-*.tar
 # In case you use Node.js/npm, you want to ignore these.
 npm-debug.log
 /assets/node_modules/
-.env

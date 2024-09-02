@@ -46,6 +46,7 @@ config :uptime, UptimeWeb.Endpoint,
 
 config :uptime,
   ecto_repos: [Uptime.Repo],
-  generators: [timestamp_type: :utc_datetime_usec, binary_id: true]
+  generators: [timestamp_type: :utc_datetime_usec, binary_id: true],
+  build_version: System.get_env("BUILD_VERSION", "dev")
 
 import_config "#{config_env()}.exs"
