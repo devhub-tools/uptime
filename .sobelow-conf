@@ -3,10 +3,10 @@
   private: false,
   skip: true,
   router: "",
-  exit: "low",
+  exit: "medium",
   format: "txt",
   out: "",
-  threshold: "low",
+  threshold: "medium",
   ignore: ["Config.HTTPS"],
   ignore_files: []
 ]

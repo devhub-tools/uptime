@@ -5,8 +5,12 @@ defmodule Uptime.Application do
 
   use Application
 
+  alias Uptime.Env
+
   @impl true
   def start(_type, _args) do
+    :ok = Env.validate_config_env_vars()
+
     children = [
       UptimeWeb.Telemetry,
       Uptime.Repo,
