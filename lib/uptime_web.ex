@@ -86,8 +86,10 @@ defmodule UptimeWeb do
       use Gettext, backend: UptimeWeb.Gettext
       # HTML escaping functionality
       import Phoenix.HTML
+      import UptimeWeb.AppComponents
       # Core UI components and translation
       import UptimeWeb.CoreComponents
+      import UptimeWeb.FormComponents
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS

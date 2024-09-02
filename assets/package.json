@@ -1,0 +1,11 @@
+{
+  "name": "assets",
+  "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "lit": "^3.2.0",
+    "luxon": "^3.5.0"
+  },
+  "devDependencies": {
+    "@types/luxon": "^3.4.2"
+  }
+}

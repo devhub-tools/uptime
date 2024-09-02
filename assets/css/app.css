@@ -2,4 +2,39 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-/* This file is for your main application CSS */
+.hovercard > .arrow,
+.hovercard > .arrow:before {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: inherit;
+  border: inherit;
+  border-bottom: none;
+  border-right: none;
+}
+
+.hovercard > .arrow {
+  visibility: hidden;
+}
+
+.hovercard > .arrow::before {
+  visibility: visible;
+  content: '';
+  transform: rotate(45deg);
+}
+
+.hovercard[data-popper-placement^='top'] > .arrow {
+  bottom: -5.5px;
+}
+
+.hovercard[data-popper-placement^='bottom'] > .arrow {
+  top: -5.5px;
+}
+
+.hovercard[data-popper-placement^='left'] > .arrow {
+  right: -5.5px;
+}
+
+.hovercard[data-popper-placement^='right'] > .arrow {
+  left: -5.5px;
+}
