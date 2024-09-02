@@ -47,8 +47,19 @@ defmodule Uptime.Service do
       :name,
       :method,
       :url,
-      :expected_status_code,
-      :expected_response_body
+      :expected_status_code
     ])
+    |> validate_timeout_interval()
+  end
+
+  defp validate_timeout_interval(changeset) do
+    timeout_ms = get_field(changeset, :timeout_ms)
+    interval_ms = get_field(changeset, :interval_ms)
+
+    if timeout_ms >= interval_ms do
+      add_error(changeset, :timeout_ms, "must be smaller than interval_ms")
+    else
+      changeset
+    end
   end
 end
