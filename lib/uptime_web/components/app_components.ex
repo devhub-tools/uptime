@@ -6,9 +6,6 @@ defmodule UptimeWeb.AppComponents do
 
   import UptimeWeb.CoreComponents
 
-  alias Uptime.Checks
-  alias Uptime.Services
-
   @doc """
   Renders a app wrapper with header and main content.
   """
@@ -46,13 +43,25 @@ defmodule UptimeWeb.AppComponents do
   attr :href, :string, default: nil
 
   def service_checks_summary(assigns) do
+    since =
+      case Enum.reverse(assigns.service.checks) do
+        [%{inserted_at: inserted_at} | _rest] -> inserted_at
+        _checks -> nil
+      end
+
+    {until, time} =
+      case assigns.service.checks do
+        [%{inserted_at: inserted_at, request_time: time} | _rest] -> {inserted_at, time}
+        _checks -> {nil, nil}
+      end
+
     assigns =
       assigns
       |> assign(:name, assigns.service.name)
       |> assign(:url_str, render_url_str(assigns.service.url))
-      |> assign(:time, Services.recent_check_field(assigns.service, :request_time))
-      |> assign(:since, Services.first_check_field(assigns.service, :inserted_at))
-      |> assign(:until, Services.recent_check_field(assigns.service, :inserted_at))
+      |> assign(:time, time)
+      |> assign(:since, since)
+      |> assign(:until, until)
       |> assign(:checks, Enum.reverse(assigns.service.checks))
       |> assign(:total_checks, length(assigns.service.checks))
 
@@ -62,7 +71,7 @@ defmodule UptimeWeb.AppComponents do
         <div class="flex flex-row items-center">
           <h2 class="text-lg font-semibold mr-2">
             <%= if not is_nil(@href) do %>
-              <.link patch={@href} class="hover:underline">
+              <.link navigate={@href} class="hover:underline">
                 <%= @name %>
               </.link>
             <% else %>
@@ -79,7 +88,7 @@ defmodule UptimeWeb.AppComponents do
       </div>
       <div class="flex flex-row">
         <%= for check <- @checks do %>
-          <.check_indicator check={check} ok={Checks.success?(check, @service)} total={@total_checks} />
+          <.check_indicator check={check} ok={check.status == :success} total={@total_checks} />
         <% end %>
       </div>
       <div class="flex flex-row justify-between text-xs text-gray-500">
@@ -135,7 +144,7 @@ defmodule UptimeWeb.AppComponents do
     case URI.parse(url) do
       %URI{host: host, path: path} when is_binary(path) -> host <> path
       %URI{host: host} -> host
-      _ -> url
+      _uri -> url
     end
   end
 

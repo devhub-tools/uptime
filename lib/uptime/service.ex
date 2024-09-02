@@ -13,6 +13,7 @@ defmodule Uptime.Service do
           expected_response_body: String.t(),
           interval_ms: integer(),
           timeout_ms: integer(),
+          checks: [Uptime.Check.t()] | Ecto.Association.NotLoaded.t(),
           inserted_at: DateTime.t(),
           updated_at: DateTime.t()
         }
@@ -22,6 +23,7 @@ defmodule Uptime.Service do
     field :name, :string
     field :method, :string
     field :url, :string
+    # expected status code is a string as it can also be a pattern like "2xx"
     field :expected_status_code, :string
     field :expected_response_body, :string
     field :interval_ms, :integer, default: 60_000

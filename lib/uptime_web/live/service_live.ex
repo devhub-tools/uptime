@@ -2,10 +2,22 @@ defmodule UptimeWeb.ServiceLive do
   @moduledoc false
   use UptimeWeb, :live_view
 
-  alias Uptime.Services
-
   @show_checks_since DateTime.add(DateTime.utc_now(), -24, :hour)
   @show_checks_until DateTime.utc_now()
+
+  def mount(%{"id" => id}, _session, socket) do
+    socket =
+      socket
+      |> assign(show_checks_since: @show_checks_since)
+      |> assign(show_checks_until: @show_checks_until)
+      |> assign(service: Uptime.get_service!(id, preload_checks: true))
+
+    # TODO: subscribe to changes in service checks
+    # if connected?(socket) do
+    # end
+
+    {:ok, socket}
+  end
 
   def render(assigns) do
     ~H"""
@@ -47,20 +59,4 @@ defmodule UptimeWeb.ServiceLive do
     </.app>
     """
   end
-
-  def mount(%{"id" => id}, _session, socket) do
-    socket =
-      socket
-      |> assign(show_checks_since: @show_checks_since)
-      |> assign(show_checks_until: @show_checks_until)
-      |> assign(service: Services.get!(id, enabled: true, checks_since: @show_checks_since))
-
-    # TODO: subscribe to changes in service checks
-    # if connected?(socket) do
-    # end
-
-    {:ok, socket}
-  end
-
-  def handle_params(_, _, socket), do: {:noreply, socket}
 end

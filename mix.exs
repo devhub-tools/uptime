@@ -9,7 +9,14 @@ defmodule Uptime.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      test_paths: ["lib"],
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.html": :test,
+        "coveralls.json": :test
+      ]
     ]
   end
 
@@ -33,13 +40,19 @@ defmodule Uptime.MixProject do
   defp deps do
     [
       {:bandit, "~> 1.5"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dns_cluster, "~> 0.1.1"},
       {:ecto_sql, "~> 3.10"},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
+      {:ex_machina, "~> 2.7", only: :test},
+      {:excoveralls, "~> 0.18", only: :test},
       {:floki, ">= 0.30.0", only: :test},
       {:gettext, "~> 0.20"},
+      {:hammox, "~> 0.7", only: :test},
+      {:injexor, "~> 1.0"},
       {:jason, "~> 1.2"},
       {:mint, github: "michaelst/mint", branch: "tracing", override: true},
+      {:mix_audit, "~> 2.0", only: [:dev, :test], runtime: false},
       {:oban, "~> 2.17"},
       {:phoenix_ecto, "~> 4.5"},
       {:phoenix_html, "~> 4.1"},
@@ -49,6 +62,7 @@ defmodule Uptime.MixProject do
       {:phoenix, "~> 1.7.14"},
       {:postgrex, ">= 0.0.0"},
       {:protobuf, "~> 0.12"},
+      {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
       {:styler, "~> 1.0.0-rc.1", only: [:dev, :test], runtime: false},
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
       {:telemetry_metrics, "~> 1.0"},

@@ -4,7 +4,7 @@ defmodule Uptime.CheckJob do
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"id" => id}, scheduled_at: scheduled_at}) do
-    case Uptime.get_service(id) do
+    case Uptime.get_service!(id) do
       %{enabled: true} = service ->
         {:ok, pid} = Uptime.Tracer.start_link(service)
 
