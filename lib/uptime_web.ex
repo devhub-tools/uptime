@@ -43,8 +43,9 @@ defmodule UptimeWeb do
         formats: [:html, :json],
         layouts: [html: UptimeWeb.Layouts]
 
+      use Gettext, backend: UptimeWeb.Gettext
+
       import Plug.Conn
-      import UptimeWeb.Gettext
 
       unquote(verified_routes())
     end
@@ -82,11 +83,11 @@ defmodule UptimeWeb do
 
   defp html_helpers do
     quote do
+      use Gettext, backend: UptimeWeb.Gettext
       # HTML escaping functionality
       import Phoenix.HTML
       # Core UI components and translation
       import UptimeWeb.CoreComponents
-      import UptimeWeb.Gettext
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
