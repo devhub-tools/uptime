@@ -17,7 +17,6 @@ defmodule UptimeWeb.CoreComponents do
   use Phoenix.Component
   use Gettext, backend: UptimeWeb.Gettext
 
-  alias Phoenix.HTML.FormField
   alias Phoenix.LiveView.JS
 
   @doc """

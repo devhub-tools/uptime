@@ -13,6 +13,7 @@ defmodule Uptime.Service do
           expected_response_body: String.t(),
           interval_ms: integer(),
           timeout_ms: integer(),
+          checks: [Uptime.Check.t()] | Ecto.Association.NotLoaded.t(),
           inserted_at: DateTime.t(),
           updated_at: DateTime.t()
         }
