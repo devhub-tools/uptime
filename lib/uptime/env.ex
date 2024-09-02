@@ -13,6 +13,7 @@ defmodule Uptime.Env do
 
   @valid_config_env_vars Enum.map(@supported_config_env_vars_suffix, &"#{@prefix}_#{&1}")
 
+  @spec validate_config_env_vars() :: :ok
   def validate_config_env_vars do
     System.get_env()
     |> Map.keys()
@@ -22,25 +23,46 @@ defmodule Uptime.Env do
         Logger.warning("Invalid environment variable: #{var}")
       end
     end)
+
+    :ok
   end
 
-  def get(@prefix <> suffix) do
-    System.get_env("#{@prefix}_#{suffix}")
+  @spec get(String.t()) :: String.t()
+  def get(name) do
+    System.get_env(name)
   end
 
-  def get(suffix) do
-    System.get_env("#{@prefix}_#{suffix}")
+  @spec get(String.t()) :: String.t()
+  def get_secret(name) do
+    case File.read("/etc/secrets/#{name}") do
+      {:ok, value} -> value
+      _ -> get(name)
+    end
   end
 
+  @spec has?(String.t()) :: boolean()
   def has?(name) do
     name
     |> get()
-    |> then(&(&1 != nil and &1 != ""))
+    |> valid_env_var_value()
+  end
+
+  @spec has_secret?(String.t()) :: boolean()
+  def has_secret?(name) do
+    case File.read("/etc/secrets/#{name}") do
+      {:ok, value} -> valid_env_var_value(value)
+      _ -> has?(name)
+    end
+  end
+
+  @spec valid_env_var_value(String.t()) :: boolean()
+  defp valid_env_var_value(value) do
+    value != nil and value != ""
   end
 
   @spec has_basic_auth?() :: boolean()
   def has_basic_auth? do
-    Uptime.Env.has?("BASIC_AUTH_USERNAME") and Uptime.Env.has?("BASIC_AUTH_PASSWORD")
+    Uptime.Env.has?("BASIC_AUTH_USERNAME") and "BASIC_AUTH_PASSWORD" |> Uptime.Env.has_secret?() |> dbg()
   end
 
   @spec build_version() :: String.t()

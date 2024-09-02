@@ -21,7 +21,7 @@ defmodule UptimeWeb.Router do
   pipeline :basic_authn do
     plug :basic_auth,
       username: Env.get("BASIC_AUTH_USERNAME"),
-      password: Env.get("BASIC_AUTH_PASSWORD")
+      password: Env.get_secret("BASIC_AUTH_PASSWORD")
   end
 
   scope "/", UptimeWeb do
