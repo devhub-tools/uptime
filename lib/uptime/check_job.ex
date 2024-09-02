@@ -8,9 +8,27 @@ defmodule Uptime.CheckJob do
       %{enabled: true} = service ->
         {:ok, pid} = Uptime.Tracer.start_link(service)
 
-        {:ok, result} = GenServer.call(pid, :trace_request)
+        case Uptime.Tracer.trace_request(pid) do
+          {:ok, result} ->
+            Uptime.save_check!(%{
+              service_id: service.id,
+              # TODO: determine if the check was successful
+              status: :success,
+              status_code: result.status_code,
+              response_body: result.response_body,
+              dns_time: result.dns_done,
+              connect_time: result.connected,
+              tls_time: result.tls_done,
+              first_byte_time: result.first_byte,
+              request_time: result.complete
+            })
 
-        Uptime.save_check(service, result)
+          {:error, :timeout} ->
+            Uptime.save_check!(%{
+              service_id: service.id,
+              status: :timeout
+            })
+        end
 
         schedule_at = DateTime.add(scheduled_at, service.interval_ms, :millisecond)
 

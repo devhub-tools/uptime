@@ -15,8 +15,7 @@ defmodule UptimeWeb.CoreComponents do
   Icons are provided by [heroicons](https://heroicons.com). See `icon/1` for usage.
   """
   use Phoenix.Component
-
-  import UptimeWeb.Gettext
+  use Gettext, backend: UptimeWeb.Gettext
 
   alias Phoenix.HTML.FormField
   alias Phoenix.LiveView.JS

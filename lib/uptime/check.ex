@@ -6,6 +6,7 @@ defmodule Uptime.Check do
 
   @type t :: %__MODULE__{
           id: String.t(),
+          status: atom(),
           status_code: integer(),
           response_body: binary(),
           dns_time: integer(),
@@ -19,6 +20,7 @@ defmodule Uptime.Check do
 
   @primary_key {:id, UXID, autogenerate: true, prefix: "chk"}
   schema "checks" do
+    field :status, Ecto.Enum, values: [:pending, :success, :failure, :timeout]
     field :status_code, :integer
     field :response_body, :binary
     field :dns_time, :integer
@@ -35,23 +37,18 @@ defmodule Uptime.Check do
   def changeset(model \\ %__MODULE__{}, attrs) do
     model
     |> cast(attrs, [
+      :status,
       :status_code,
       :response_body,
       :dns_time,
       :connect_time,
       :tls_time,
       :first_byte_time,
-      :request_time
+      :request_time,
+      :service_id
     ])
     |> validate_required([
-      :status_code,
-      :response_body,
-      :dns_time,
-      :connect_time,
-      :tls_time,
-      :first_byte_time,
-      :request_time
+      :status
     ])
-    |> put_assoc(:service, attrs.service)
   end
 end
