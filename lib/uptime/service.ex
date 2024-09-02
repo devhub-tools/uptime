@@ -12,6 +12,7 @@ defmodule Uptime.Service do
           expected_status_code: String.t(),
           expected_response_body: String.t(),
           interval_ms: integer(),
+          timeout_ms: integer(),
           inserted_at: DateTime.t(),
           updated_at: DateTime.t()
         }
@@ -23,7 +24,8 @@ defmodule Uptime.Service do
     field :url, :string
     field :expected_status_code, :string
     field :expected_response_body, :string
-    field :interval_ms, :integer
+    field :interval_ms, :integer, default: 60_000
+    field :timeout_ms, :integer, default: 10_000
     field :enabled, :boolean, default: true
 
     timestamps()
@@ -38,6 +40,7 @@ defmodule Uptime.Service do
       :expected_status_code,
       :expected_response_body,
       :interval_ms,
+      :timeout_ms,
       :enabled
     ])
     |> validate_required([
@@ -45,8 +48,7 @@ defmodule Uptime.Service do
       :method,
       :url,
       :expected_status_code,
-      :expected_response_body,
-      :interval_ms
+      :expected_response_body
     ])
   end
 end

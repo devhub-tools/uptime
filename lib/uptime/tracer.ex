@@ -13,11 +13,17 @@ defmodule Uptime.Tracer do
     GenServer.start_link(__MODULE__, service)
   end
 
+  def trace_request(pid) do
+    GenServer.call(pid, :trace_request)
+  end
+
   def init(service) do
     {:ok, %__MODULE__{service: service, result: %Result{}}}
   end
 
   def handle_call(:trace_request, from, state) do
+    Process.send_after(self(), :timeout, state.service.timeout_ms)
+
     :ok = :inet_db.set_lookup([:file, :dns])
     :ok = :inet_db.set_cache_size(0)
 
@@ -47,6 +53,12 @@ defmodule Uptime.Tracer do
 
   def handle_info(:done, state) do
     GenServer.reply(state.from, {:ok, state.result})
+
+    {:stop, :normal, nil}
+  end
+
+  def handle_info(:timeout, state) do
+    GenServer.reply(state.from, {:error, :timeout})
 
     {:stop, :normal, nil}
   end
