@@ -1,11 +1,9 @@
 defmodule UptimeWeb.Router do
   use UptimeWeb, :router
 
-  import Plug.BasicAuth
-
   alias Uptime.Env
 
-@csp_default_src "default-src 'self'"
+  @csp_default_src "default-src 'self'"
   @csp_connect_src "connect-src 'self'"
   @csp_frame_src "frame-src 'self'"
   @csp_script_src "script-src 'self'"
@@ -22,25 +20,16 @@ defmodule UptimeWeb.Router do
     plug :put_root_layout, html: {UptimeWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers, %{"content-security-policy" => @csp}
+    plug :basic_auth
   end
 
   pipeline :api do
     plug :accepts, ["json"]
   end
 
-  pipeline :basic_authn do
-    plug :basic_auth,
-      username: Env.get("BASIC_AUTH_USERNAME"),
-      password: Env.get_secret("BASIC_AUTH_PASSWORD")
-  end
-
   scope "/", UptimeWeb do
     pipe_through :browser
 
-    if Env.has_basic_auth?() do
-      pipe_through :basic_authn
-    end
-    
     live "/", DashboardLive, :index
     live "/:id", ServiceLive, :index
   end
@@ -63,6 +52,14 @@ defmodule UptimeWeb.Router do
       pipe_through :browser
 
       live_dashboard "/dashboard", metrics: UptimeWeb.Telemetry
+    end
+  end
+
+  defp basic_auth(conn, _opts) do
+    if Env.get(:enable_basic_auth?) do
+      Plug.BasicAuth.basic_auth(conn, Env.get(:basic_auth))
+    else
+      conn
     end
   end
 end

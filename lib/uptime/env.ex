@@ -27,44 +27,26 @@ defmodule Uptime.Env do
     :ok
   end
 
-  @spec get(String.t()) :: String.t()
-  def get(name) do
-    System.get_env(name)
-  end
-
-  @spec get(String.t()) :: String.t()
-  def get_secret(name) do
+  @spec read(String.t()) :: String.t()
+  def read(name) do
     case File.read("/etc/secrets/#{name}") do
       {:ok, value} -> value
-      _ -> get(name)
+      _not_found -> System.get_env(name)
     end
   end
 
   @spec has?(String.t()) :: boolean()
   def has?(name) do
     name
-    |> get()
+    |> read()
     |> valid_env_var_value()
   end
 
-  @spec has_secret?(String.t()) :: boolean()
-  def has_secret?(name) do
-    case File.read("/etc/secrets/#{name}") do
-      {:ok, value} -> valid_env_var_value(value)
-      _ -> has?(name)
-    end
-  end
+  @spec get(atom()) :: any()
+  def get(key), do: Application.get_env(:uptime, key)
 
   @spec valid_env_var_value(String.t()) :: boolean()
   defp valid_env_var_value(value) do
     value != nil and value != ""
   end
-
-  @spec has_basic_auth?() :: boolean()
-  def has_basic_auth? do
-    Uptime.Env.has?("BASIC_AUTH_USERNAME") and "BASIC_AUTH_PASSWORD" |> Uptime.Env.has_secret?() |> dbg()
-  end
-
-  @spec build_version() :: String.t()
-  def build_version, do: Application.get_env(:uptime, :build_version)
 end
