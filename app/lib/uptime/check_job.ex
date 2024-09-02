@@ -6,7 +6,11 @@ defmodule Uptime.CheckJob do
   def perform(%Oban.Job{args: %{"id" => id}, scheduled_at: scheduled_at}) do
     case Uptime.get_service(id) do
       %{enabled: true} = service ->
-        Uptime.run_check(service)
+        {:ok, pid} = Uptime.Tracer.start_link(service)
+
+        {:ok, result} = GenServer.call(pid, :trace_request)
+
+        Uptime.save_check(service, result)
 
         schedule_at = DateTime.add(scheduled_at, service.interval_ms, :millisecond)
 
