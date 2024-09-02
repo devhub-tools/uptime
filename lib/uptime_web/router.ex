@@ -1,6 +1,10 @@
 defmodule UptimeWeb.Router do
   use UptimeWeb, :router
 
+  import Plug.BasicAuth
+
+  alias Uptime.Env
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -14,8 +18,18 @@ defmodule UptimeWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :basic_authn do
+    plug :basic_auth,
+      username: Env.get("BASIC_AUTH_USERNAME"),
+      password: Env.get("BASIC_AUTH_PASSWORD")
+  end
+
   scope "/", UptimeWeb do
     pipe_through :browser
+
+    if Env.has_basic_auth?() do
+      pipe_through :basic_authn
+    end
 
     get "/", PageController, :home
   end
