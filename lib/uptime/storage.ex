@@ -1,5 +1,7 @@
 defmodule Uptime.Storage do
   @moduledoc false
+  @behaviour __MODULE__
+
   import Ecto.Query
 
   alias Uptime.Check
@@ -11,7 +13,7 @@ defmodule Uptime.Storage do
   ###
   ### Services
   ###
-  @spec get_service!(String.t(), Keyword.t()) :: Service.t()
+  @callback get_service!(String.t(), Keyword.t()) :: Service.t()
   def get_service!(id, opts) do
     %{preload_checks: preload_checks} = Enum.into(opts, @default_opts)
 
@@ -20,7 +22,7 @@ defmodule Uptime.Storage do
     |> Repo.one!()
   end
 
-  @spec list_services(Keyword.t()) :: [Service.t()]
+  @callback list_services(Keyword.t()) :: [Service.t()]
   def list_services(opts) do
     %{enabled: enabled, preload_checks: preload_checks} = Enum.into(opts, @default_opts)
 
@@ -33,7 +35,7 @@ defmodule Uptime.Storage do
   ###
   ### Checks
   ###
-  @callback save_check!(Uptime.Service.t()) :: Uptime.Check.t()
+  @callback save_check!(map()) :: Uptime.Check.t()
   def save_check!(attrs) do
     attrs
     |> Uptime.Check.changeset()
@@ -44,11 +46,11 @@ defmodule Uptime.Storage do
   ### Utils
   ###
   @spec maybe_where(Ecto.Query.t(), atom(), any()) :: Ecto.Query.t()
-  defp maybe_where(query, field, condition) when not is_nil(condition) do
+  defp maybe_where(query, _opt, nil), do: query
+
+  defp maybe_where(query, field, condition) do
     from query, where: ^[{field, condition}]
   end
-
-  defp maybe_where(query, _opt, _value), do: query
 
   @spec maybe_preload_checks([Service.t()] | Ecto.Query.t(), boolean()) :: Ecto.Query.t()
   defp maybe_preload_checks(services, true) when is_list(services) do

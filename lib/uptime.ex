@@ -2,6 +2,8 @@ defmodule Uptime do
   @moduledoc false
   @behaviour __MODULE__
 
+  use Injexor, inject: [Uptime.Storage]
+
   alias Uptime.Storage
 
   @callback get_service!(String.t()) :: Service.t()

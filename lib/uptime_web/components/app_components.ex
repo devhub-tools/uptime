@@ -144,7 +144,7 @@ defmodule UptimeWeb.AppComponents do
     case URI.parse(url) do
       %URI{host: host, path: path} when is_binary(path) -> host <> path
       %URI{host: host} -> host
-      _ -> url
+      _uri -> url
     end
   end
 

@@ -1,0 +1,160 @@
+name: Test
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  checks: write
+  contents: read
+  pull-requests: read
+  statuses: write
+
+jobs:
+  test_elixir:
+    name: Run Elixir Tests
+    runs-on: ubuntu-latest
+    env:
+      MIX_ENV: test
+
+    services:
+      db:
+        image: postgres:15-alpine
+        ports: ["5432:5432"]
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Elixir
+        uses: ./.github/actions/setup-elixir
+
+      - name: Setup
+        run: mix do compile, ecto.reset
+
+      - name: Run tests
+        run: mix coveralls.json
+
+      - name: Check Code Coverage
+        uses: coverbot-io/coverbot-action@v3
+        with:
+          format: elixir
+          file: cover/excoveralls.json
+          coverbot_api_key: ${{ secrets.COVERBOT_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+  rollback:
+    name: Ensure Migration Rollback Safety
+    runs-on: ubuntu-latest
+    env:
+      MIX_ENV: test
+
+    services:
+      db:
+        image: postgres:13.4-alpine
+        ports: ["5432:5432"]
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Elixir
+        uses: ./.github/actions/setup-elixir
+
+      - name: Rollback Migrations
+        run: mix do ecto.setup, ecto.rollback --all
+
+  check_formatting:
+    name: Check Formatting
+    runs-on: ubuntu-latest
+    env:
+      MIX_ENV: dev
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Elixir
+        uses: ./.github/actions/setup-elixir
+
+      - name: Check formatting
+        run: mix format --check-formatted
+
+  credo:
+    name: Credo
+    runs-on: ubuntu-latest
+    env:
+      MIX_ENV: test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Elixir
+        uses: ./.github/actions/setup-elixir
+
+      - name: Check formatting
+        run: mix credo --strict
+
+  audit_elixir_dependencies:
+    name: Audit Elixir Dependencies
+    runs-on: ubuntu-latest
+    env:
+      MIX_ENV: test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Elixir
+        uses: ./.github/actions/setup-elixir
+
+      - name: Audit dependencies
+        run: mix deps.audit
+
+  compile_without_warnings:
+    name: Compile without Warnings
+    runs-on: ubuntu-latest
+    env:
+      MIX_ENV: test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Elixir
+        uses: ./.github/actions/setup-elixir
+
+      - name: Enforce no warnings
+        run: mix do clean, compile --warnings-as-errors
+
+  sobelow:
+    name: Sobelow
+    runs-on: ubuntu-latest
+    env:
+      MIX_ENV: dev
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Elixir
+        uses: ./.github/actions/setup-elixir
+
+      - name: Perform Static Security Analysis
+        run: mix sobelow --config

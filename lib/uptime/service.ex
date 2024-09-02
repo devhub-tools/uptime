@@ -23,6 +23,7 @@ defmodule Uptime.Service do
     field :name, :string
     field :method, :string
     field :url, :string
+    # expected status code is a string as it can also be a pattern like "2xx"
     field :expected_status_code, :string
     field :expected_response_body, :string
     field :interval_ms, :integer, default: 60_000

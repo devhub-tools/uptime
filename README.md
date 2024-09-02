@@ -1,3 +1,5 @@
+![coverbot badge](https://api.coverbot.io/devhub-tools/uptime/main/badge.svg)
+
 # Uptime
 
 ## Develop

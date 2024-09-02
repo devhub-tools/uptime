@@ -1,0 +1,85 @@
+# This action is designed to be a general purpose 'setup' action for Elixir applications.
+#
+# ## Requirements ##
+#
+# This is not a published action and can only be used in this organization.
+#
+# ## Usage ##
+#
+# You must first check out the repo with the `actions/checkout@v4` action
+# in order for github to be able to access this action.
+# The OTP and Elixir versions are the ones specified in the `.tool-versions` file of the repo using this action.
+#
+# ## Caching ##
+#
+# Caching support requires checking `mix.lock` in. This is used to generate a
+# hash of the build that is checked for cache validity.
+name: Setup Elixir & Application
+description: Setup Elixir & OTP, Compile Deps & App
+
+inputs:
+  hexpm-key:
+    description: sourced from secrets.HEXPM_KEY
+  cache-version:
+    description: Bump version to clear cache in cases where the key doesn't break it when it needs to
+    default: v1
+outputs:
+  # Passthrough outputs from steps in the action
+  elixir-version:
+    description: Elixir version
+    value: ${{ steps.setup-elixir.outputs.elixir-version }}
+  otp-version:
+    description: OTP Version
+    value: ${{ steps.setup-elixir.outputs.otp-version }}
+  used-cache:
+    description: Was the cache used?
+    value: ${{ steps.mix-cache.outputs.cache-hit == 'true' }}
+runs:
+  using: composite
+  steps:
+    - name: Setup Elixir
+      uses: erlef/setup-beam@v1
+      id: setup-elixir
+      with:
+        version-type: strict
+        version-file: .tool-versions
+
+    - name: echo Elixir/OTP version
+      shell: bash
+      run: |
+        echo "Elixir version: ${{ steps.setup-elixir.outputs.elixir-version }}"
+        echo "OTP version: ${{ steps.setup-elixir.outputs.otp-version }}"
+        echo "MIX_ENV: ${{ inputs.MIX_ENV }}"
+
+      # Caches may be shared from the base branch (main), feature branches
+      # Caches will be purged when any of the variables in the key changes.
+      # yamllint disable rule
+    - name: Retrieve Mix Dependencies Cache
+      uses: actions/cache@v4
+      id: mix-cache
+      with:
+        path: deps
+        # yamllint disable-line rule:line-length
+        key: cache-${{inputs.cache-version}}-${{ runner.os }}-${{ steps.setup-elixir.outputs.elixir-version }}-${{ steps.setup-elixir.outputs.otp-version }}-${{ env.MIX_ENV }}-deps-mix_lock_hash-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+        # yamllint disable-line rule:line-length
+        restore-keys: cache-${{inputs.cache-version}}-${{ runner.os }}-${{ steps.setup-elixir.outputs.elixir-version }}-${{ steps.setup-elixir.outputs.otp-version }}-${{ env.MIX_ENV }}
+
+    - name: Retrieve _build cache
+      uses: actions/cache@v4
+      id: build-cache
+      with:
+        path: _build
+        # yamllint disable-line rule:line-length
+        key: cache-${{inputs.cache-version}}-${{ runner.os }}-${{ steps.setup-elixir.outputs.elixir-version }}-${{ steps.setup-elixir.outputs.otp-version }}-${{ env.MIX_ENV }}-build-mix_lock_hash-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+        # yamllint disable-line rule:line-length
+        restore-keys: cache-${{inputs.cache-version}}-${{ runner.os }}-${{ steps.setup-elixir.outputs.elixir-version }}-${{ steps.setup-elixir.outputs.otp-version }}-${{ env.MIX_ENV }}-build-
+
+    - name: Get Dependencies
+      shell: bash
+      run: |
+        mix local.hex --force
+        mix deps.get
+
+    - name: Compile application
+      shell: bash
+      run: mix compile

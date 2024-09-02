@@ -77,8 +77,8 @@ defmodule UptimeWeb.DashboardLive do
     """
   end
 
-  def handle_event("view_option", opts, socket) do
-    dbg(opts)
+  def handle_event("view_option", _opts, socket) do
+    # dbg(opts)
 
     {:noreply, socket}
   end

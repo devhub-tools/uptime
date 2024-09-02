@@ -2,8 +2,6 @@ defmodule UptimeWeb.ServiceLive do
   @moduledoc false
   use UptimeWeb, :live_view
 
-  alias Uptime.Services
-
   @show_checks_since DateTime.add(DateTime.utc_now(), -24, :hour)
   @show_checks_until DateTime.utc_now()
 
@@ -20,8 +18,6 @@ defmodule UptimeWeb.ServiceLive do
 
     {:ok, socket}
   end
-
-  def handle_params(_, _, socket), do: {:noreply, socket}
 
   def render(assigns) do
     ~H"""
