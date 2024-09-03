@@ -35,7 +35,7 @@ defmodule UptimeWeb.DashboardLive do
 
   def render(assigns) do
     ~H"""
-    <div id="window-resize" phx-hook="WindowResize" class="max-w-5xl mx-auto mt-6">
+    <div id="window-resize" phx-hook="WindowResize">
       <%= for service <- @services do %>
         <.service_checks_summary
           service={service}
@@ -75,14 +75,11 @@ defmodule UptimeWeb.DashboardLive do
   end
 
   defp calculate_checks_limit(width) do
-    cond do
-      width < 320 -> 20
-      width < 480 -> 30
-      width < 640 -> 40
-      width < 768 -> 50
-      width < 1024 -> 75
-      true -> 120
-    end
+    (width / 10 - 10)
+    |> Decimal.from_float()
+    |> Decimal.round(0)
+    |> Decimal.to_integer()
+    |> max(20)
   end
 
   defp list_services(checks) do

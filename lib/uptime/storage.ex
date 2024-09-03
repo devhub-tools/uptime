@@ -15,7 +15,7 @@ defmodule Uptime.Storage do
   ###
   @callback get_service!(String.t(), Keyword.t()) :: Service.t()
   def get_service!(id, opts) do
-    %{preload_checks: preload_checks, limit_checks: limit_checks} = Enum.into(opts, @default_opts)
+    %{preload_checks: preload_checks, limit_checks: limit_checks} = service_query_opts(opts)
 
     from(s in Service, where: s.id == ^id)
     |> maybe_preload_checks(preload_checks, limit_checks)
@@ -24,7 +24,7 @@ defmodule Uptime.Storage do
 
   @callback list_services(Keyword.t()) :: [Service.t()]
   def list_services(opts) do
-    %{enabled: enabled, preload_checks: preload_checks, limit_checks: limit_checks} = Enum.into(opts, @default_opts)
+    %{enabled: enabled, preload_checks: preload_checks, limit_checks: limit_checks} = service_query_opts(opts)
 
     from(Service)
     |> maybe_where(:enabled, enabled)
@@ -64,4 +64,11 @@ defmodule Uptime.Storage do
   end
 
   defp maybe_preload_checks(query, _preload_checks, _limit), do: query
+
+  @spec service_query_opts(Keyword.t()) :: map()
+  defp service_query_opts(opts) do
+    opts
+    |> Enum.into(@default_opts)
+    |> Map.update(:limit_checks, 30, &min(&1, 1000))
+  end
 end
