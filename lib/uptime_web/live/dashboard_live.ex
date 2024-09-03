@@ -1,5 +1,7 @@
 defmodule UptimeWeb.DashboardLive do
-  @moduledoc false
+  @moduledoc """
+  Dashboard page shows a summary of all services.
+  """
   use UptimeWeb, :live_view
 
   # Placeholder for dashboard setting
@@ -24,12 +26,7 @@ defmodule UptimeWeb.DashboardLive do
 
   def handle_params(params, _uri, socket) do
     if connected?(socket) do
-      socket =
-        assign(socket,
-          view: params["view"] || "day",
-          services: Uptime.list_services(enabled: true, preload_checks: true)
-        )
-
+      socket = assign(socket, view: params["view"] || "day")
       {:noreply, socket}
     else
       {:noreply, socket}
@@ -38,7 +35,7 @@ defmodule UptimeWeb.DashboardLive do
 
   def render(assigns) do
     ~H"""
-    <div class="max-w-5xl mx-auto mt-6">
+    <div id="window-resize" phx-hook="WindowResize" class="max-w-5xl mx-auto mt-6">
       <%= for service <- @services do %>
         <.service_checks_summary
           service={service}
@@ -68,5 +65,25 @@ defmodule UptimeWeb.DashboardLive do
 
         {:noreply, assign(socket, services: updated_services)}
     end
+  end
+
+  def handle_event("window_resize", values, socket) do
+    width = Map.get(values, "width", 800)
+    socket = assign(socket, services: list_services(calculate_checks_limit(width)))
+
+    {:noreply, socket}
+  end
+
+  defp calculate_checks_limit(width) do
+    cond do
+      width < 640 -> 20
+      width < 768 -> 50
+      width < 1024 -> 75
+      true -> 120
+    end
+  end
+
+  defp list_services(checks) do
+    Uptime.list_services(enabled: true, preload_checks: true, limit_checks: checks)
   end
 end

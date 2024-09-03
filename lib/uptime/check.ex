@@ -51,4 +51,9 @@ defmodule Uptime.Check do
       :status
     ])
   end
+
+  @spec success?(Uptime.Check.t()) :: boolean()
+  def success?(%Uptime.Check{} = check) do
+    check.status == :success
+  end
 end

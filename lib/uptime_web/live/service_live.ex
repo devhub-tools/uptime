@@ -1,12 +1,14 @@
 defmodule UptimeWeb.ServiceLive do
-  @moduledoc false
+  @moduledoc """
+  Service page shows checks results for a specific service.
+  """
   use UptimeWeb, :live_view
 
   @show_checks_since DateTime.add(DateTime.utc_now(), -24, :hour)
   @show_checks_until DateTime.utc_now()
 
   def mount(%{"id" => id}, _session, socket) do
-    service = Uptime.get_service!(id, preload_checks: true)
+    service = Uptime.get_service!(id, enabled: true, preload_checks: true, limit_checks: 50)
 
     socket =
       socket

@@ -6,6 +6,8 @@ defmodule UptimeWeb.AppComponents do
 
   import UptimeWeb.CoreComponents
 
+  alias Uptime.Check
+
   @doc """
   Render the service checks for a given window.
   """
@@ -60,7 +62,7 @@ defmodule UptimeWeb.AppComponents do
       </div>
       <div class="flex flex-row">
         <%= for check <- @checks do %>
-          <.check_indicator check={check} ok={check.status == :success} total={@total_checks} />
+          <.check_indicator check={check} success={Check.success?(check)} />
         <% end %>
       </div>
       <div class="flex flex-row justify-between text-xs text-gray-500">
@@ -75,21 +77,17 @@ defmodule UptimeWeb.AppComponents do
   Render the check indicator box for a service check.
   """
   attr :check, :map, required: true
-  attr :ok, :boolean, default: false
-  attr :total, :integer, default: nil
+  attr :success, :boolean, default: false
 
   def check_indicator(assigns) do
-    assigns =
-      assign(
-        assigns,
-        :width_percent,
-        100 / assigns.total
-      )
-
     ~H"""
-    <.hover_card style={"width:#{@width_percent}%"} class="box-content w-full h-12">
+    <.hover_card class="box-content w-full h-12">
       <.hover_card_trigger class="px-px w-full h-full">
-        <div class={["w-full h-full rounded-full", @ok && "bg-green-500", !@ok && "bg-red-500"]} />
+        <div class={[
+          "w-full h-full rounded-full",
+          @success && "bg-green-500",
+          !@success && "bg-red-500"
+        ]} />
       </.hover_card_trigger>
       <.hover_card_content class="w-60" id={@check.id}>
         <div class="space-y-2 text-sm">
