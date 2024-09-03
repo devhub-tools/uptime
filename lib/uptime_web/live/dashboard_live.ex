@@ -70,7 +70,6 @@ defmodule UptimeWeb.DashboardLive do
   def handle_event("window_resize", values, socket) do
     width = Map.get(values, "width", 800)
     socket = assign(socket, services: list_services(calculate_checks_limit(width)))
-
     {:noreply, socket}
   end
 

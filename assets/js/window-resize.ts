@@ -1,4 +1,5 @@
 import type { Hook } from "./helpers";
+import { debounce } from "lodash";
 
 type WindowResize = {
   resize?: (ev: Event) => void;
@@ -6,17 +7,17 @@ type WindowResize = {
 
 export const WindowResizeHook: WindowResize = {
   mounted() {
-    // Send initial window size
-    this.pushEvent?.("window_resize", {
-      width: window.innerWidth,
-      height: window.innerHeight,
-    });
-    // Watch for changes in the window size
-    this.resize = (_ev: Event) => {
+    const update = debounce(() => {
       this.pushEvent?.("window_resize", {
         width: window.innerWidth,
         height: window.innerHeight,
       });
+    }, 250);
+    // Send initial window size
+    update();
+    // Watch for changes in the window size
+    this.resize = (_ev: Event) => {
+      update();
     };
     window.addEventListener("resize", this.resize);
   },
