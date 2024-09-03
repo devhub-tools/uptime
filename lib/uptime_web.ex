@@ -60,6 +60,14 @@ defmodule UptimeWeb do
     end
   end
 
+  def component do
+    quote do
+      use Phoenix.Component
+
+      import UptimeWeb.Components.Helpers
+    end
+  end
+
   def live_component do
     quote do
       use Phoenix.LiveComponent
@@ -87,6 +95,7 @@ defmodule UptimeWeb do
       # HTML escaping functionality
       import Phoenix.HTML
       import UptimeWeb.AppComponents
+      import UptimeWeb.Components.Helpers
       # Core UI components and translation
       import UptimeWeb.CoreComponents
       import UptimeWeb.FormComponents

@@ -76,7 +76,9 @@ defmodule UptimeWeb.DashboardLive do
 
   defp calculate_checks_limit(width) do
     cond do
-      width < 640 -> 20
+      width < 320 -> 20
+      width < 480 -> 30
+      width < 640 -> 40
       width < 768 -> 50
       width < 1024 -> 75
       true -> 120

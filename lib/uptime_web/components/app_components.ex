@@ -2,7 +2,7 @@ defmodule UptimeWeb.AppComponents do
   @moduledoc """
   Provides app UI components.
   """
-  use Phoenix.Component
+  use UptimeWeb, :component
 
   import UptimeWeb.CoreComponents
 
@@ -62,7 +62,7 @@ defmodule UptimeWeb.AppComponents do
       </div>
       <div class="flex flex-row">
         <%= for check <- @checks do %>
-          <.check_indicator check={check} success={Check.success?(check)} />
+          <.check_indicator check={check} />
         <% end %>
       </div>
       <div class="flex flex-row justify-between text-xs text-gray-500">
@@ -77,9 +77,10 @@ defmodule UptimeWeb.AppComponents do
   Render the check indicator box for a service check.
   """
   attr :check, :map, required: true
-  attr :success, :boolean, default: false
 
   def check_indicator(assigns) do
+    assigns = assign(assigns, :success, Check.success?(assigns.check))
+
     ~H"""
     <.hover_card class="box-content w-full h-12">
       <.hover_card_trigger class="px-px w-full h-full">
@@ -89,7 +90,7 @@ defmodule UptimeWeb.AppComponents do
           !@success && "bg-red-500"
         ]} />
       </.hover_card_trigger>
-      <.hover_card_content class="w-60" id={@check.id}>
+      <.hover_card_content class="w-60" id={unique_id()}>
         <div class="space-y-2 text-sm">
           <div class="flex items-center">
             <span class="text-xs text-muted-foreground">
