@@ -73,6 +73,7 @@ defmodule UptimeWeb.DashboardLive do
     {:noreply, socket}
   end
 
+  # Leaves width of color bar ~8-9px accounting for page padding and margins between bars.
   defp calculate_checks_limit(width) do
     (width / 10 - 10)
     |> Decimal.from_float()

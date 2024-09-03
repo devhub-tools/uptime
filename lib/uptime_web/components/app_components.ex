@@ -82,7 +82,7 @@ defmodule UptimeWeb.AppComponents do
     assigns = assign(assigns, :success, Check.success?(assigns.check))
 
     ~H"""
-    <.hover_card class="box-content w-full h-12">
+    <.hover_card class="w-full h-12">
       <.hover_card_trigger class="px-px w-full h-full">
         <div class={[
           "w-full h-full rounded-full",
