@@ -30,6 +30,10 @@ defmodule UptimeWeb.Router do
     plug :accepts, ["json"]
   end
 
+  scope "/v1/api", UptimeWeb.Controllers do
+    get "/services/:id/uptimes/:duration/badge.svg", BadgeController, :uptime
+  end
+
   scope "/", UptimeWeb do
     pipe_through :browser
 
