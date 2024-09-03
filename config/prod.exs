@@ -11,6 +11,7 @@ config :uptime, UptimeWeb.Endpoint, cache_static_manifest: "priv/static/cache_ma
 
 config :uptime,
   supported_config_dirs: ["/etc/uptime"],
+  # sobelow_skip ["Config.Secrets"]
   supported_secrets_dir: "/etc/secrets"
 
 # Do not print debug messages in production
