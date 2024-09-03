@@ -46,6 +46,7 @@ defmodule Uptime.MixProject do
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:ex_machina, "~> 2.7", only: :test},
       {:excoveralls, "~> 0.18", only: :test},
+      {:file_system, "~> 1.0"},
       {:floki, ">= 0.30.0", only: :test},
       {:gettext, "~> 0.20"},
       {:hammox, "~> 0.7", only: :test},
@@ -68,6 +69,7 @@ defmodule Uptime.MixProject do
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:uxid, "~> 0.2"},
+      {:yaml_elixir, "~> 2.11"},
       {:heroicons,
        github: "tailwindlabs/heroicons", tag: "v2.1.1", sparse: "optimized", app: false, compile: false, depth: 1}
     ]
