@@ -6,7 +6,7 @@ on: # yamllint disable-line rule:truthy
       - main
       - docker
     paths:
-      - app/*
+      - ./*
       - .github/workflows/publish-app.yaml
 
 permissions:
@@ -62,8 +62,8 @@ jobs:
         with:
           cache-map: |
             {
-              "app-deps": "/app/deps",
-              "app-build-prod": "/app/_build/prod"
+              "app-deps": "/deps",
+              "app-build-prod": "/_build/prod"
             }
           skip-extraction: ${{ steps.cache.outputs.cache-hit }}
 
