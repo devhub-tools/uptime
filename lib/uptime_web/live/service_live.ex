@@ -23,42 +23,16 @@ defmodule UptimeWeb.ServiceLive do
 
   def render(assigns) do
     ~H"""
-    <.app>
-      <:actions>
-        <.select
-          :let={select}
-          id="select-single-select"
-          name="option"
-          phx-change="view_option"
-          placeholder="Options"
-        >
-          <.select_trigger instance={select} class="w-[100px]" target="my-select" />
-          <.select_content class="w-full" instance={select}>
-            <.select_group>
-              <.select_item instance={select} value="day" label="Day" />
-              <.select_item instance={select} value="week" label="Week" />
-              <.select_item instance={select} value="month" label="Month" />
-              <.select_item instance={select} value="year" label="Year" />
-            </.select_group>
-          </.select_content>
-        </.select>
-        <%!-- TODO: hide when configuration comes from env vars, otherwise use to create new services --%>
-        <.button>
-          <.icon name="hero-plus" class="h-4 w-4 flex-none" />
-        </.button>
-      </:actions>
-
-      <div class="max-w-5xl mx-auto mt-6 space-y-6">
-        <.service_checks_summary
-          service={@service}
-          window_started_at={@show_checks_since}
-          window_ended_at={@show_checks_until}
-        />
-        <div>
-          TODO: More details about the checks for this service...
-        </div>
+    <div class="max-w-5xl mx-auto mt-6 space-y-6">
+      <.service_checks_summary
+        service={@service}
+        window_started_at={@show_checks_since}
+        window_ended_at={@show_checks_until}
+      />
+      <div>
+        TODO: More details about the checks for this service...
       </div>
-    </.app>
+    </div>
     """
   end
 
@@ -70,3 +44,21 @@ defmodule UptimeWeb.ServiceLive do
     {:noreply, assign(socket, service: updated_service)}
   end
 end
+
+# <.select
+# :let={select}
+# id="select-single-select"
+# name="option"
+# phx-change="view_option"
+# placeholder="Options"
+# >
+# <.select_trigger instance={select} class="w-[100px]" target="my-select" />
+# <.select_content class="w-full" instance={select}>
+#   <.select_group>
+#     <.select_item instance={select} value="day" label="Day" />
+#     <.select_item instance={select} value="week" label="Week" />
+#     <.select_item instance={select} value="month" label="Month" />
+#     <.select_item instance={select} value="year" label="Year" />
+#   </.select_group>
+# </.select_content>
+# </.select>

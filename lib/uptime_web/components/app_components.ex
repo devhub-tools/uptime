@@ -7,34 +7,6 @@ defmodule UptimeWeb.AppComponents do
   import UptimeWeb.CoreComponents
 
   @doc """
-  Renders a app wrapper with header and main content.
-  """
-  attr :class, :string, default: nil
-  slot :inner_block, required: true
-  slot :actions
-
-  def app(assigns) do
-    ~H"""
-    <header class={[
-      "px-6 lg:px-10 py-8",
-      @actions != [] && "flex items-center justify-between gap-6",
-      @class
-    ]}>
-      <.link class="flex items-center space-x-2" patch="/">
-        <.icon name="hero-check-badge" class="h-7 w-7 flex-none" />
-        <h1 class="text-lg font-semibold leading-8 text-zinc-800">
-          Uptime
-        </h1>
-      </.link>
-      <div class="flex flex-row space-x-3"><%= render_slot(@actions) %></div>
-    </header>
-    <main class="flex-1 px-6">
-      <%= render_slot(@inner_block) %>
-    </main>
-    """
-  end
-
-  @doc """
   Render the service checks for a given window.
   """
   attr :service, :map, required: true
