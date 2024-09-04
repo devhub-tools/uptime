@@ -28,7 +28,10 @@ config :tailwind,
 config :uptime, Oban,
   engine: Oban.Engines.Basic,
   queues: [default: 10],
-  repo: Uptime.Repo
+  repo: Uptime.Repo,
+  # related: https://hexdocs.pm/oban/troubleshooting.html#jobs-stuck-available-and-won-t-execute
+  plugins: [Oban.Plugins.Lifeline],
+  shutdown_grace_period: :timer.seconds(30)
 
 config :uptime, Uptime.Repo,
   migration_primary_key: [type: :text],

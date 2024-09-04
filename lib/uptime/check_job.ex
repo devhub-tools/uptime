@@ -4,6 +4,8 @@ defmodule Uptime.CheckJob do
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: %{"id" => id}, scheduled_at: scheduled_at}) do
+    started_at = DateTime.utc_now()
+
     case Uptime.get_service!(id) do
       %{enabled: true} = service ->
         {:ok, pid} = Uptime.Tracer.start_link(service)
@@ -31,6 +33,13 @@ defmodule Uptime.CheckJob do
         end
 
         schedule_at = DateTime.add(scheduled_at, service.interval_ms, :millisecond)
+
+        schedule_at =
+          if DateTime.before?(schedule_at, started_at) do
+            DateTime.add(started_at, service.interval_ms, :millisecond)
+          else
+            schedule_at
+          end
 
         {:ok, _job} =
           %{id: id}
