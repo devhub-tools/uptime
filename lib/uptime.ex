@@ -22,4 +22,24 @@ defmodule Uptime do
   def save_check!(attrs) do
     Storage.save_check!(attrs)
   end
+
+  @spec subscribe_checks() :: :ok | {:error, term()}
+  def subscribe_checks do
+    Phoenix.PubSub.subscribe(Uptime.PubSub, Storage.check_topic())
+  end
+
+  @spec subscribe_checks(String.t()) :: :ok | {:error, term()}
+  def subscribe_checks(service_id) do
+    Phoenix.PubSub.subscribe(Uptime.PubSub, Storage.check_topic(service_id))
+  end
+
+  @spec unsubscribe_checks() :: :ok
+  def unsubscribe_checks do
+    Phoenix.PubSub.unsubscribe(Uptime.PubSub, Storage.check_topic())
+  end
+
+  @spec unsubscribe_checks(String.t()) :: :ok
+  def unsubscribe_checks(service_id) do
+    Phoenix.PubSub.unsubscribe(Uptime.PubSub, Storage.check_topic(service_id))
+  end
 end

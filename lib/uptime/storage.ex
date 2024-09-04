@@ -35,11 +35,12 @@ defmodule Uptime.Storage do
   ###
   ### Checks
   ###
-  @callback save_check!(map()) :: Uptime.Check.t()
+  @callback save_check!(map()) :: Check.t()
   def save_check!(attrs) do
     attrs
-    |> Uptime.Check.changeset()
-    |> Uptime.Repo.insert!()
+    |> Check.changeset()
+    |> Repo.insert!()
+    |> tap(&broadcast!/1)
   end
 
   ###
@@ -68,4 +69,16 @@ defmodule Uptime.Storage do
   end
 
   defp maybe_preload_checks(query, _preload_checks), do: query
+
+  @spec broadcast!(Check.t()) :: :ok
+  defp broadcast!(%Check{} = check) do
+    Phoenix.PubSub.broadcast!(Uptime.PubSub, check_topic(), {Check, check})
+    Phoenix.PubSub.broadcast!(Uptime.PubSub, check_topic(check.service_id), {Check, check})
+  end
+
+  @spec check_topic() :: String.t()
+  def check_topic, do: "service:all"
+
+  @spec check_topic(String.t()) :: String.t()
+  def check_topic(service_id), do: "service:#{service_id}"
 end
