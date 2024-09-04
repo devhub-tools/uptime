@@ -91,7 +91,7 @@ defmodule UptimeWeb.DashboardLive do
         {:noreply, socket}
 
       service ->
-        checks = [check | service.checks]
+        checks = [check | pop_check(service)]
         updated_service = %{service | checks: checks}
 
         updated_services =
@@ -100,4 +100,6 @@ defmodule UptimeWeb.DashboardLive do
         {:noreply, assign(socket, services: updated_services)}
     end
   end
+
+  defp pop_check(%Uptime.Service{checks: checks}), do: checks |> Enum.reverse() |> tl() |> Enum.reverse()
 end
