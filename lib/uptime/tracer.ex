@@ -41,7 +41,7 @@ defmodule Uptime.Tracer do
         end
       )
 
-    {:ok, conn, _ref} = Mint.HTTP.request(conn, state.service.method, uri.path, [], "")
+    {:ok, conn, _ref} = Mint.HTTP.request(conn, state.service.method, uri.path || "/", [], "")
 
     {:noreply, %{state | from: from, conn: conn, start: start}}
   end
