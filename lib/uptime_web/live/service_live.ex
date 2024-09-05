@@ -64,10 +64,9 @@ defmodule UptimeWeb.ServiceLive do
 
   def handle_info({Uptime.Check, %Uptime.Check{} = check}, socket) do
     service = socket.assigns.service
-    checks = [check | pop_check(service)]
+    # Keep the checks list fixed to calculated amount due to screen width contraints
+    checks = [check | List.delete_at(service.checks, -1)]
     updated_service = %{service | checks: checks}
     {:noreply, assign(socket, service: updated_service)}
   end
-
-  defp pop_check(%Uptime.Service{checks: checks}), do: checks |> Enum.reverse() |> tl() |> Enum.reverse()
 end
