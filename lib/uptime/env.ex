@@ -15,6 +15,8 @@ defmodule Uptime.Env do
 
   @valid_config_env_vars Enum.map(@supported_config_env_vars_suffix, &"#{@prefix}_#{&1}")
 
+  @secrets_directory Application.compile_env(:uptime, :supported_secret_dir, "/etc/secrets")
+
   @spec validate_configuration() :: :ok
   def validate_configuration do
     System.get_env()
@@ -38,13 +40,12 @@ defmodule Uptime.Env do
   def read(name) do
     prefixed_name = "#{@prefix}_#{name}"
 
-    file_contents =
-      :supported_secrets_dir
-      |> get("/etc/secrets")
+    secret_file_result =
+      @secrets_directory
       |> Path.join(prefixed_name)
       |> File.read()
 
-    case file_contents do
+    case secret_file_result do
       {:ok, value} ->
         value
 
