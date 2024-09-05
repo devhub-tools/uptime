@@ -15,7 +15,7 @@ defmodule Uptime.Env do
 
   @valid_config_env_vars Enum.map(@supported_config_env_vars_suffix, &"#{@prefix}_#{&1}")
 
-  @secrets_directory Application.compile_env(:uptime, :supported_secret_dir, "/etc/secrets")
+  @secrets_directory Application.compile_env(:uptime, :supported_secrets_dir, "/etc/secrets")
 
   @spec validate_configuration() :: :ok
   def validate_configuration do

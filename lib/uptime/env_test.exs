@@ -7,7 +7,6 @@ defmodule Uptime.EnvTest do
 
   describe "read/1" do
     test "reads config value from secrets file" do
-      Application.put_env(:uptime, :supported_secrets_dir, @test_dir)
       secret = "secret value"
 
       :ok =

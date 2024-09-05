@@ -23,3 +23,6 @@ config :uptime, UptimeWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
   secret_key_base: "nsevTQJH15ibNcReDj/4EGRMUCapJSpGR3YU28ahYup0K6e09au1vkabv7lZQSAs",
   server: false
+
+config :uptime,
+  supported_secrets_dir: Path.join(File.cwd!(), "test")
