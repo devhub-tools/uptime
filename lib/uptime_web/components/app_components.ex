@@ -4,35 +4,10 @@ defmodule UptimeWeb.AppComponents do
   """
   use Phoenix.Component
 
+  import UptimeWeb.Components.Helpers
   import UptimeWeb.CoreComponents
 
-  @doc """
-  Renders a app wrapper with header and main content.
-  """
-  attr :class, :string, default: nil
-  slot :inner_block, required: true
-  slot :actions
-
-  def app(assigns) do
-    ~H"""
-    <header class={[
-      "px-6 lg:px-10 py-8",
-      @actions != [] && "flex items-center justify-between gap-6",
-      @class
-    ]}>
-      <.link class="flex items-center space-x-2" patch="/">
-        <.icon name="hero-check-badge" class="h-7 w-7 flex-none" />
-        <h1 class="text-lg font-semibold leading-8 text-zinc-800">
-          Uptime
-        </h1>
-      </.link>
-      <div class="flex flex-row space-x-3"><%= render_slot(@actions) %></div>
-    </header>
-    <main class="flex-1 px-6">
-      <%= render_slot(@inner_block) %>
-    </main>
-    """
-  end
+  alias Uptime.Check
 
   @doc """
   Render the service checks for a given window.
@@ -88,7 +63,7 @@ defmodule UptimeWeb.AppComponents do
       </div>
       <div class="flex flex-row">
         <%= for check <- @checks do %>
-          <.check_indicator check={check} ok={check.status == :success} total={@total_checks} />
+          <.check_indicator check={check} />
         <% end %>
       </div>
       <div class="flex flex-row justify-between text-xs text-gray-500">
@@ -103,23 +78,20 @@ defmodule UptimeWeb.AppComponents do
   Render the check indicator box for a service check.
   """
   attr :check, :map, required: true
-  attr :ok, :boolean, default: false
-  attr :total, :integer, default: nil
 
   def check_indicator(assigns) do
-    assigns =
-      assign(
-        assigns,
-        :width_percent,
-        100 / assigns.total
-      )
+    assigns = assign(assigns, :success, Check.success?(assigns.check))
 
     ~H"""
-    <.hover_card style={"width:#{@width_percent}%"} class="box-content w-full h-12">
+    <.hover_card class="w-full h-12">
       <.hover_card_trigger class="px-px w-full h-full">
-        <div class={["w-full h-full rounded-full", @ok && "bg-green-500", !@ok && "bg-red-500"]} />
+        <div class={[
+          "w-full h-full rounded-full",
+          @success && "bg-green-500",
+          !@success && "bg-red-500"
+        ]} />
       </.hover_card_trigger>
-      <.hover_card_content class="w-60" id={@check.id}>
+      <.hover_card_content class="w-60" id={unique_id()}>
         <div class="space-y-2 text-sm">
           <div class="flex items-center">
             <span class="text-xs text-muted-foreground">

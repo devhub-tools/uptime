@@ -1,6 +1,10 @@
 defmodule UptimeWeb.DashboardLive do
-  @moduledoc false
+  @moduledoc """
+  Dashboard page shows a summary of all services.
+  """
   use UptimeWeb, :live_view
+
+  alias UptimeWeb.Utils
 
   # Placeholder for dashboard setting
   @show_checks_since DateTime.add(DateTime.utc_now(), -24, :hour)
@@ -24,12 +28,7 @@ defmodule UptimeWeb.DashboardLive do
 
   def handle_params(params, _uri, socket) do
     if connected?(socket) do
-      socket =
-        assign(socket,
-          view: params["view"] || "day",
-          services: Uptime.list_services(enabled: true, preload_checks: true)
-        )
-
+      socket = assign(socket, view: params["view"] || "day")
       {:noreply, socket}
     else
       {:noreply, socket}
@@ -38,47 +37,17 @@ defmodule UptimeWeb.DashboardLive do
 
   def render(assigns) do
     ~H"""
-    <.app>
-      <:actions>
-        <.select
-          :let={select}
-          id="select-single-select"
-          name="option"
-          phx-change="view_option"
-          placeholder="Options"
-        >
-          <.select_trigger instance={select} class="w-[100px]" target="my-select" />
-          <.select_content class="w-full" instance={select}>
-            <.select_group>
-              <.select_item instance={select} value="day" label="Day" />
-              <.select_item instance={select} value="week" label="Week" />
-              <.select_item instance={select} value="month" label="Month" />
-              <.select_item instance={select} value="year" label="Year" />
-            </.select_group>
-          </.select_content>
-        </.select>
-        <%!-- TODO: hide when configuration comes from env vars, otherwise use to create new services --%>
-        <.button>
-          <.icon name="hero-plus" class="h-4 w-4 text-gray-400" />
-        </.button>
-      </:actions>
-
-      <div class="max-w-5xl mx-auto mt-6">
-        <%= for service <- @services do %>
-          <.service_checks_summary
-            service={service}
-            window_started_at={@show_checks_since}
-            window_ended_at={@show_checks_until}
-            href={~p"/#{service.id}"}
-          />
-        <% end %>
-      </div>
-    </.app>
+    <div id="window-resize" phx-hook="WindowResize">
+      <%= for service <- @services do %>
+        <.service_checks_summary
+          service={service}
+          window_started_at={@show_checks_since}
+          window_ended_at={@show_checks_until}
+          href={~p"/#{service.id}"}
+        />
+      <% end %>
+    </div>
     """
-  end
-
-  def handle_event("view_option", _opts, socket) do
-    {:noreply, socket}
   end
 
   def handle_info({Uptime.Check, %Uptime.Check{} = check}, socket) do
@@ -98,5 +67,15 @@ defmodule UptimeWeb.DashboardLive do
 
         {:noreply, assign(socket, services: updated_services)}
     end
+  end
+
+  def handle_event("window_resize", values, socket) do
+    width = Map.get(values, "width", 800)
+    socket = assign(socket, services: list_services(Utils.calculate_checks_limit(width)))
+    {:noreply, socket}
+  end
+
+  defp list_services(checks) do
+    Uptime.list_services(enabled: true, preload_checks: true, limit_checks: checks)
   end
 end

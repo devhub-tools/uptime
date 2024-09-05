@@ -23,6 +23,7 @@ import { LiveSocket } from "phoenix_live_view";
 import topbar from "../vendor/topbar";
 import "./format-date";
 import { Tooltip } from "./popper";
+import { WindowResizeHook } from "./window-resize";
 
 const Hooks = {
   Tooltip: {
@@ -36,6 +37,7 @@ const Hooks = {
       this.el.tooltip?.destroy();
     },
   },
+  WindowResize: WindowResizeHook,
 };
 
 let csrfToken = document
