@@ -1,5 +1,4 @@
-import type { Hook } from "./helpers";
-import { debounce } from "lodash";
+import { type Hook, debounce } from "./helpers";
 
 type WindowResize = {
   resize?: (ev: Event) => void;

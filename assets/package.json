@@ -3,11 +3,9 @@
   "dependencies": {
     "@popperjs/core": "^2.11.8",
     "lit": "^3.2.0",
-    "lodash": "^4.17.21",
     "luxon": "^3.5.0"
   },
   "devDependencies": {
-    "@types/lodash": "^4.17.7",
     "@types/luxon": "^3.4.2"
   }
 }

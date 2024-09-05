@@ -24,3 +24,16 @@ export type Hook = {
   ) => void;
   handleEvent?: (event: string, callback: (payload: object) => void) => void;
 };
+
+export const debounce = <F extends (...args: Parameters<F>) => ReturnType<F>>(
+  callback: F,
+  wait: number
+): ((...args: Parameters<F>) => void) => {
+  let timeoutId: ReturnType<typeof setTimeout>;
+  return (...args: Parameters<F>): void => {
+    window.clearTimeout(timeoutId);
+    timeoutId = window.setTimeout(() => {
+      callback(...args);
+    }, wait);
+  };
+};
