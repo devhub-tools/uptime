@@ -68,6 +68,7 @@ defmodule Uptime.MixProject do
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:uxid, "~> 0.2"},
+      {:yaml_elixir, "~> 2.11"},
       {:heroicons,
        github: "tailwindlabs/heroicons", tag: "v2.1.1", sparse: "optimized", app: false, compile: false, depth: 1}
     ]
@@ -85,7 +86,7 @@ defmodule Uptime.MixProject do
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
-      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
+      "assets.setup": ["cmd npm install --prefix assets", "tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["tailwind uptime", "esbuild uptime"],
       "assets.deploy": [
         "tailwind uptime --minify",

@@ -9,6 +9,11 @@ config :logger, level: :info
 
 config :uptime, UptimeWeb.Endpoint, cache_static_manifest: "priv/static/cache_manifest.json"
 
+config :uptime,
+  supported_config_dirs: ["/etc/uptime"],
+  # sobelow_skip ["Config.Secrets"]
+  supported_secrets_dir: "/etc/secrets"
+
 # Do not print debug messages in production
 
 # Runtime production configuration, including reading

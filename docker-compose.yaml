@@ -36,9 +36,9 @@ services:
       MIX_ENV: dev
       SERVER_URL: http://uptime.arpa
     env_file:
-      - ./app/.env
+      - .env
     volumes:
-      - ./app:/app
+      - ./:/app
     labels:
       traefik.enable: "true"
       traefik.http.routers.app.rule: Host(`uptime.arpa`)
@@ -67,7 +67,7 @@ services:
       PGOPTIONS: -c log_statement=all
       PGDATA: /var/lib/postgresql/data
     env_file:
-      - ./app/.env
+      - .env
     ports:
       - ${DATABASE_PORT:-5432}:5432
     volumes:

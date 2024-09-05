@@ -9,7 +9,7 @@ defmodule Uptime.Application do
 
   @impl true
   def start(_type, _args) do
-    :ok = Env.validate_config_env_vars()
+    :ok = Env.validate_configuration()
 
     children = [
       UptimeWeb.Telemetry,

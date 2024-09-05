@@ -6,7 +6,7 @@ on: # yamllint disable-line rule:truthy
       - main
       - docker
     paths:
-      - app/*
+      - ./*
       - .github/workflows/publish-app.yaml
 
 permissions:

@@ -38,4 +38,7 @@ config :uptime, UptimeWeb.Endpoint,
     ]
   ]
 
-config :uptime, dev_routes: true
+config :uptime,
+  dev_routes: true,
+  supported_config_dirs: [File.cwd!()],
+  supported_secrets_dir: File.cwd!()
