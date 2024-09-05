@@ -1,6 +1,6 @@
 defmodule UptimeWeb.FormComponents do
   @moduledoc false
-  use UptimeWeb, :component
+  use Phoenix.Component
 
   alias Phoenix.LiveView.JS
 

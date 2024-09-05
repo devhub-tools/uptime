@@ -60,14 +60,6 @@ defmodule UptimeWeb do
     end
   end
 
-  def component do
-    quote do
-      use Phoenix.Component
-
-      import UptimeWeb.Components.Helpers
-    end
-  end
-
   def live_component do
     quote do
       use Phoenix.LiveComponent

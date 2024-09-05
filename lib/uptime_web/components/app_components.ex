@@ -2,8 +2,9 @@ defmodule UptimeWeb.AppComponents do
   @moduledoc """
   Provides app UI components.
   """
-  use UptimeWeb, :component
+  use Phoenix.Component
 
+  import UptimeWeb.Components.Helpers
   import UptimeWeb.CoreComponents
 
   alias Uptime.Check
