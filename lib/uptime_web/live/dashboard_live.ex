@@ -15,9 +15,9 @@ defmodule UptimeWeb.DashboardLive do
         services: []
       )
 
-    # TODO: subscribe to changes in all service checks
-    # if connected?(socket) do
-    # end
+    if connected?(socket) do
+      Uptime.subscribe_checks()
+    end
 
     {:ok, socket}
   end
@@ -81,5 +81,24 @@ defmodule UptimeWeb.DashboardLive do
     # dbg(opts)
 
     {:noreply, socket}
+  end
+
+  def handle_info({Uptime.Check, %Uptime.Check{} = check}, socket) do
+    service_id = check.service_id
+
+    case Enum.find(socket.assigns.services, fn service -> service.id == service_id end) do
+      nil ->
+        {:noreply, socket}
+
+      service ->
+        # Keep the checks list fixed to calculated amount due to screen width contraints
+        checks = [check | List.delete_at(service.checks, -1)]
+        updated_service = %{service | checks: checks}
+
+        updated_services =
+          Enum.map(socket.assigns.services, fn s -> if s.id == service_id, do: updated_service, else: s end)
+
+        {:noreply, assign(socket, services: updated_services)}
+    end
   end
 end

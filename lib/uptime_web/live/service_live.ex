@@ -6,15 +6,17 @@ defmodule UptimeWeb.ServiceLive do
   @show_checks_until DateTime.utc_now()
 
   def mount(%{"id" => id}, _session, socket) do
+    service = Uptime.get_service!(id, preload_checks: true)
+
     socket =
       socket
       |> assign(show_checks_since: @show_checks_since)
       |> assign(show_checks_until: @show_checks_until)
-      |> assign(service: Uptime.get_service!(id, preload_checks: true))
+      |> assign(service: service)
 
-    # TODO: subscribe to changes in service checks
-    # if connected?(socket) do
-    # end
+    if connected?(socket) do
+      Uptime.subscribe_checks(service.id)
+    end
 
     {:ok, socket}
   end
@@ -58,5 +60,13 @@ defmodule UptimeWeb.ServiceLive do
       </div>
     </.app>
     """
+  end
+
+  def handle_info({Uptime.Check, %Uptime.Check{} = check}, socket) do
+    service = socket.assigns.service
+    # Keep the checks list fixed to calculated amount due to screen width contraints
+    checks = [check | List.delete_at(service.checks, -1)]
+    updated_service = %{service | checks: checks}
+    {:noreply, assign(socket, service: updated_service)}
   end
 end

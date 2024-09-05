@@ -35,11 +35,11 @@ defmodule Uptime.Storage do
   ###
   ### Checks
   ###
-  @callback save_check!(map()) :: Uptime.Check.t()
+  @callback save_check!(map()) :: Check.t()
   def save_check!(attrs) do
     attrs
-    |> Uptime.Check.changeset()
-    |> Uptime.Repo.insert!()
+    |> Check.changeset()
+    |> Repo.insert!()
   end
 
   ###
