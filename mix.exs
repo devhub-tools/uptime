@@ -46,7 +46,6 @@ defmodule Uptime.MixProject do
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:ex_machina, "~> 2.7", only: :test},
       {:excoveralls, "~> 0.18", only: :test},
-      {:file_system, "~> 1.0"},
       {:floki, ">= 0.30.0", only: :test},
       {:gettext, "~> 0.20"},
       {:hammox, "~> 0.7", only: :test},
