@@ -21,7 +21,7 @@ defmodule UptimeWeb.DashboardLive do
       Uptime.subscribe_checks()
     end
 
-    {:ok, socket, layout: {UptimeWeb.Layouts, :dashboard}}
+    {:ok, socket}
   end
 
   def handle_params(params, _uri, socket) do
