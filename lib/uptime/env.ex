@@ -36,28 +36,23 @@ defmodule Uptime.Env do
   First check for a secrets file, then the environment, then the config file.
   secrets file > environment variable > config file
   """
-  @spec read(String.t()) :: String.t()
-  def read(name) do
+  @spec read(String.t(), any()) :: String.t()
+  def read(name, default \\ nil) do
     prefixed_name = "#{@prefix}_#{name}"
 
-    secret_file_result =
-      @secrets_directory
-      |> Path.join(prefixed_name)
-      |> File.read()
+    secret_file_path = Path.join(@secrets_directory, prefixed_name)
 
-    case secret_file_result do
+    with {:error, _error} <- File.read(secret_file_path),
+         :error <- read_from_env(prefixed_name),
+         :error <-
+           read_from_config_file(name, find_config_path()) do
+      default
+    else
       {:ok, value} ->
-        value
-
-      _not_found ->
-        case read_from_env(prefixed_name) do
-          {:ok, value} ->
-            value
-
-          _not_found ->
-            name
-            |> String.downcase()
-            |> read_from_config_file(find_config_path())
+        if valid_env_var_value(value) do
+          value
+        else
+          default
         end
     end
   end
@@ -75,17 +70,19 @@ defmodule Uptime.Env do
 
   @spec read_from_config_file(String.t(), String.t()) :: any() | nil
   defp read_from_config_file(key, path) when is_binary(path) do
+    key = String.downcase(key)
+
     case YamlElixir.read_from_file(path) do
       {:ok, config} ->
         # TODO: Implement a deep get function when we add nested configuration structure
-        config[key]
+        {:ok, config[key]}
 
       _not_found ->
-        nil
+        :error
     end
   end
 
-  defp read_from_config_file(_key, path) when is_nil(path), do: nil
+  defp read_from_config_file(_key, nil), do: :error
 
   @spec find_config_path() :: String.t() | nil
   defp find_config_path do

@@ -43,6 +43,11 @@ defmodule Uptime.EnvTest do
     test "returns empty value if no config option is found" do
       assert Uptime.Env.read("NONEXISTENT_OPTION") == nil
     end
+
+    test "returns default value if no config option is found" do
+      default = "default value"
+      assert Uptime.Env.read("NONEXISTENT_OPTION", default) == default
+    end
   end
 
   describe "has?/1" do
