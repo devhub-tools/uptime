@@ -4,6 +4,8 @@ defmodule UptimeWeb.DashboardLive do
   """
   use UptimeWeb, :live_view
 
+  alias UptimeWeb.Utils
+
   # Placeholder for dashboard setting
   @show_checks_since DateTime.add(DateTime.utc_now(), -24, :hour)
   @show_checks_until DateTime.utc_now()
@@ -69,17 +71,8 @@ defmodule UptimeWeb.DashboardLive do
 
   def handle_event("window_resize", values, socket) do
     width = Map.get(values, "width", 800)
-    socket = assign(socket, services: list_services(calculate_checks_limit(width)))
+    socket = assign(socket, services: list_services(Utils.calculate_checks_limit(width)))
     {:noreply, socket}
-  end
-
-  # Leaves width of color bar ~8-9px accounting for page padding and margins between bars.
-  defp calculate_checks_limit(width) do
-    (width / 10 - 10)
-    |> Decimal.from_float()
-    |> Decimal.round(0)
-    |> Decimal.to_integer()
-    |> max(20)
   end
 
   defp list_services(checks) do

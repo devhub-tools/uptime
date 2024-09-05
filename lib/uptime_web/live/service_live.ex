@@ -46,21 +46,3 @@ defmodule UptimeWeb.ServiceLive do
     {:noreply, assign(socket, service: updated_service)}
   end
 end
-
-# <.select
-# :let={select}
-# id="select-single-select"
-# name="option"
-# phx-change="view_option"
-# placeholder="Options"
-# >
-# <.select_trigger instance={select} class="w-[100px]" target="my-select" />
-# <.select_content class="w-full" instance={select}>
-#   <.select_group>
-#     <.select_item instance={select} value="day" label="Day" />
-#     <.select_item instance={select} value="week" label="Week" />
-#     <.select_item instance={select} value="month" label="Month" />
-#     <.select_item instance={select} value="year" label="Year" />
-#   </.select_group>
-# </.select_content>
-# </.select>
