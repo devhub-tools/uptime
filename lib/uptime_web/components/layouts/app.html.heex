@@ -1,12 +1,25 @@
-<header class="px-6 lg:px-10 py-8">
-  <.link class="flex items-center space-x-2" patch="/">
+<header class="px-6 py-8 flex items-center justify-between gap-6">
+  <.link class={["flex items-center space-x-2 px-1 rounded-md", focus_class()]} patch="/">
     <.icon name="hero-check-badge" class="h-7 w-7 flex-none" />
     <h1 class="text-lg font-semibold leading-8 text-zinc-800">
       Uptime
     </h1>
   </.link>
+  <div class="flex flex-row space-x-3">
+    <.theme_toggle />
+  </div>
 </header>
 <main class="flex-1 px-6">
   <.flash_group flash={@flash} />
   <%= @inner_content %>
 </main>
+<footer class="text-center p-3 text-xs text-muted-foreground space-x-8">
+  <a
+    class="hover:underline"
+    href="https://github.com/devhub-tools/uptime"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    source
+  </a>
+</footer>

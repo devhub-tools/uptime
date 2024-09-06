@@ -14,12 +14,16 @@ export default class FormatDateTime extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    this.timerInterval = setInterval(() => this.requestUpdate(), 1000);
+    if (this.format === "relative") {
+      this.timerInterval = setInterval(() => this.requestUpdate(), 1000);
+    }
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    clearInterval(this.timerInterval);
+    if (this.timerInterval !== undefined) {
+      clearInterval(this.timerInterval);
+    }
   }
 
   render() {

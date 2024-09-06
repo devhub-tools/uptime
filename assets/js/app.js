@@ -1,20 +1,3 @@
-// If you want to use Phoenix channels, run `mix help phx.gen.channel`
-// to get started and then uncomment the line below.
-// import "./user_socket.js"
-
-// You can include dependencies in two ways.
-//
-// The simplest option is to put them in assets/vendor and
-// import them using relative paths:
-//
-//     import "../vendor/some-package.js"
-//
-// Alternatively, you can `npm install some-package --prefix assets` and import
-// them using a path starting with the package name:
-//
-//     import "some-package"
-//
-
 // Include phoenix_html to handle method=PUT/DELETE in forms and buttons.
 import "phoenix_html";
 // Establish Phoenix Socket and LiveView configuration.
@@ -24,6 +7,7 @@ import topbar from "../vendor/topbar";
 import "./format-date";
 import { Tooltip } from "./popper";
 import { WindowResizeHook } from "./window-resize";
+import { ThemeToggleHook } from "./theme-toggle";
 
 const Hooks = {
   Tooltip: {
@@ -38,12 +22,13 @@ const Hooks = {
     },
   },
   WindowResize: WindowResizeHook,
+  ThemeToggle: ThemeToggleHook,
 };
 
-let csrfToken = document
+const csrfToken = document
   .querySelector("meta[name='csrf-token']")
   .getAttribute("content");
-let liveSocket = new LiveSocket("/live", Socket, {
+const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: { _csrf_token: csrfToken },
   hooks: Hooks,
