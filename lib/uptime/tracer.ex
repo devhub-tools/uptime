@@ -8,9 +8,9 @@ defmodule Uptime.Tracer do
     @moduledoc false
 
     @type t :: %__MODULE__{
-            dns_done: boolean(),
-            connected: boolean(),
-            tls_done: boolean(),
+            dns_done: integer(),
+            connected: integer(),
+            tls_done: integer(),
             first_byte: integer(),
             complete: integer(),
             status_code: integer(),

@@ -38,6 +38,7 @@ defmodule Uptime do
     case Storage.save_service(attrs) do
       {:ok, service} ->
         %{id: service.id} |> CheckJob.new(scheduled_at: DateTime.utc_now()) |> Oban.insert()
+        {:ok, service}
 
       error ->
         error

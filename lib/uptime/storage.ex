@@ -37,7 +37,7 @@ defmodule Uptime.Storage do
 
     from(Service)
     |> maybe_where(:enabled, enabled)
-    |> order_by(asc: :inserted_at)
+    |> order_by(asc: :name)
     |> Repo.all()
     |> maybe_preload_checks(preload_checks, limit_checks)
   end
