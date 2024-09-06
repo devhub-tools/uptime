@@ -30,7 +30,7 @@ defmodule Uptime.Service do
     field :url, :string
     # expected status code is a string as it can also be a pattern like "2xx"
     # TODO: we should make this a list
-    field :expected_status_code, :string
+    field :expected_status_code, :string, default: "2xx"
     # TODO: we should make this a list
     field :expected_response_body, :string
     field :interval_ms, :integer, default: 60_000
@@ -56,8 +56,7 @@ defmodule Uptime.Service do
     ])
     |> validate_required([
       :name,
-      :url,
-      :expected_status_code
+      :url
     ])
     |> unique_constraint(:name)
     |> validate_timeout_interval()
@@ -101,8 +100,8 @@ defmodule Uptime.Service do
            true <- service.expected_response_body == "" do
         :failure
       else
-        {code, _str} when is_integer(code) ->
-          status_code?(code, service.expected_status_code, result)
+        {parsed_expected_code, _str} when is_integer(parsed_expected_code) ->
+          status_code?(parsed_expected_code, result.status_code)
 
         {:ok, result} when is_boolean(result) ->
           result
@@ -118,17 +117,19 @@ defmodule Uptime.Service do
     end
   end
 
-  @spec status_code?(integer(), String.t(), Result.t()) :: boolean()
-  defp status_code?(code, code_str, %Result{} = result) do
-    code_length = code |> Integer.digits() |> length()
+  @spec status_code?(integer(), integer()) :: boolean()
+  defp status_code?(_expected_parsed_code, nil), do: false
+
+  @spec status_code?(integer(), integer()) :: boolean()
+  defp status_code?(expected_parsed_code, status_code_result) do
+    expected_code_length = expected_parsed_code |> Integer.digits() |> length()
 
     cond do
-      code_length == 3 ->
-        code == result.status_code
+      expected_code_length == 3 ->
+        expected_parsed_code == status_code_result
 
-      code_length == 1 and
-          String.starts_with?(code_str, Integer.to_string(code)) ->
-        String.starts_with?(Integer.to_string(result.status_code), Integer.to_string(code))
+      expected_code_length == 1 ->
+        status_code_result |> Integer.digits() |> Enum.at(0) == expected_parsed_code
 
       true ->
         false
