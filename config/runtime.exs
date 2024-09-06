@@ -8,7 +8,8 @@ end
 
 config :uptime,
   basic_auth: [username: Env.read("BASIC_AUTH_USERNAME"), password: Env.read("BASIC_AUTH_PASSWORD")],
-  enable_basic_auth?: Env.has?("BASIC_AUTH_USERNAME") and Env.has?("BASIC_AUTH_PASSWORD")
+  enable_basic_auth?: Env.has?("BASIC_AUTH_USERNAME") and Env.has?("BASIC_AUTH_PASSWORD"),
+  services: Env.read_services()
 
 if config_env() == :prod do
   database_url =

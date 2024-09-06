@@ -6,6 +6,17 @@ defmodule Uptime.Tracer do
 
   defmodule Result do
     @moduledoc false
+
+    @type t :: %__MODULE__{
+            dns_done: boolean(),
+            connected: boolean(),
+            tls_done: boolean(),
+            first_byte: integer(),
+            complete: integer(),
+            status_code: integer(),
+            response_body: String.t()
+          }
+
     defstruct [:dns_done, :connected, :tls_done, :first_byte, :complete, :status_code, :response_body]
   end
 

@@ -4,9 +4,11 @@ defmodule Uptime.Check do
 
   import Ecto.Changeset
 
+  @type status :: :pending | :success | :failure | :timeout
+
   @type t :: %__MODULE__{
           id: String.t(),
-          status: atom(),
+          status: status(),
           status_code: integer(),
           response_body: binary(),
           dns_time: integer(),
@@ -50,10 +52,5 @@ defmodule Uptime.Check do
     |> validate_required([
       :status
     ])
-  end
-
-  @spec success?(Uptime.Check.t()) :: boolean()
-  def success?(%Uptime.Check{} = check) do
-    check.status == :success
   end
 end
