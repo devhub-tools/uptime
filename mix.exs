@@ -13,6 +13,7 @@ defmodule Uptime.MixProject do
       test_paths: ["lib"],
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [
+        check: :test,
         coveralls: :test,
         "coveralls.html": :test,
         "coveralls.json": :test
@@ -92,7 +93,9 @@ defmodule Uptime.MixProject do
         "tailwind uptime --minify",
         "esbuild uptime --minify",
         "phx.digest"
-      ]
+      ],
+      check: ["credo --strict", "sobelow --config .sobelow.yml", "test"],
+      config_seeds: ["cmd mix run priv/repo/config_seeds.exs"]
     ]
   end
 end

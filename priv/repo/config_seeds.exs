@@ -32,7 +32,6 @@ defmodule ConfigSeed do
     %{id: service.id}
     |> Uptime.CheckJob.new(scheduled_at: DateTime.utc_now())
     |> Oban.insert()
-    |> dbg()
   end
 
   defp create_job({:error, _changeset}), do: nil
