@@ -4,6 +4,8 @@ services:
   - name: google
     url: https://www.google.com
     expected_status_code: 200
+    interval_ms: 5000
+    timeout_ms: 3000
   - name: github
     url: https://github.com
     expected_status_code: 200
@@ -17,3 +19,5 @@ services:
   - name: localhost:4000
     url: http://localhost:4000
     expected_status_code: 200
+    interval_ms: 1000
+    timeout_ms: 500
