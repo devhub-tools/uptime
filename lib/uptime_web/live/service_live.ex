@@ -43,7 +43,7 @@ defmodule UptimeWeb.ServiceLive do
           </div>
           <div>
             <.link href={"/services/#{@service.slug}/uptimes/#{"7d"}/badge.svg"}>
-              <.response_time_badge duration="7d" average_response_time={40} />
+              <.response_time_badge duration="7d" average_response_time={170} />
             </.link>
           </div>
           <div>

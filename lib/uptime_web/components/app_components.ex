@@ -203,6 +203,7 @@ defmodule UptimeWeb.AppComponents do
     |> assign(:value_width, String.length(assigns.value) * 11)
     |> assign(:color, uptime_color(assigns.uptime))
     |> assign(:label, "uptime #{assigns.duration}")
+    |> assign(:id, "uptime")
     |> status_svg()
   end
 
@@ -213,10 +214,11 @@ defmodule UptimeWeb.AppComponents do
     assigns = assign(assigns, :value, Integer.to_string(assigns.average_response_time) <> "ms")
 
     assigns
-    |> assign(:label_width, 100)
+    |> assign(:label_width, 105)
     |> assign(:value_width, String.length(assigns.value) * 11)
     |> assign(:color, response_time_color(assigns.average_response_time))
     |> assign(:label, "response time #{assigns.duration}")
+    |> assign(:id, "response")
     |> status_svg()
   end
 
@@ -229,9 +231,11 @@ defmodule UptimeWeb.AppComponents do
     |> assign(:color, (assigns.up && @badge_colors.excellent) || @badge_colors.very_bad)
     |> assign(:label, "health")
     |> assign(:value, (assigns.up && "up") || "down")
+    |> assign(:id, "health")
     |> status_svg()
   end
 
+  attr :id, :string, required: true
   attr :label_width, :integer, required: true
   attr :value_width, :integer, required: true
   attr :color, :string, required: true
@@ -244,20 +248,22 @@ defmodule UptimeWeb.AppComponents do
       |> assign(:label_x, assigns.label_width / 2)
       |> assign(:value_x, assigns.label_width + assigns.value_width / 2)
       |> assign(:width, assigns.label_width + assigns.value_width)
+      |> assign(:id_mask, assigns.id <> "-mask")
+      |> assign(:id_gradient, assigns.id <> "-gradient")
 
     ~H"""
     <svg xmlns="http://www.w3.org/2000/svg" width={@width} height="20">
-      <linearGradient id="b" x2="0" y2="100%">
+      <linearGradient id={@id_gradient} x2="0" y2="100%">
         <stop offset="0" stop-color="#bbb" stop-opacity=".1" />
         <stop offset="1" stop-opacity=".1" />
       </linearGradient>
-      <mask id="a">
+      <mask id={@id_mask}>
         <rect width={@width} height="20" rx="3" fill="#fff" />
       </mask>
-      <g mask="url(#a)">
+      <g mask={"url(##{@id_mask})"}>
         <path fill="#555" d={"M0 0h#{@label_width}v20H0z"} />
         <path fill={@color} d={"M#{@label_width} 0h#{@value_width}v20H#{@label_width}z"} />
-        <path fill="url(#b)" d={"M0 0h#{@width}v20H0z"} />
+        <path fill={"url(##{@id_gradient})"} d={"M0 0h#{@width}v20H0z"} />
       </g>
       <g
         fill="#fff"
