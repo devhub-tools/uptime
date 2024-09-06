@@ -8,6 +8,7 @@ import "./format-date";
 import { Tooltip } from "./popper";
 import { WindowResizeHook } from "./window-resize";
 import { ThemeToggleHook } from "./theme-toggle";
+import { CreateChartHook } from "./charting";
 
 const Hooks = {
   Tooltip: {
@@ -23,6 +24,7 @@ const Hooks = {
   },
   WindowResize: WindowResizeHook,
   ThemeToggle: ThemeToggleHook,
+  Chart: CreateChartHook,
 };
 
 const csrfToken = document

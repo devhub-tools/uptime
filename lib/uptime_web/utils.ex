@@ -3,6 +3,9 @@ defmodule UptimeWeb.Utils do
   Utility functions for UptimeWeb.
   """
 
+  def ok(socket), do: {:ok, socket}
+  def noreply(socket), do: {:noreply, socket}
+
   @doc """
   Calculate limit of checks to display.
 

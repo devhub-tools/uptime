@@ -1,6 +1,7 @@
 {
   "name": "assets",
   "dependencies": {
+    "chart.js": "^4.0.0",
     "@popperjs/core": "^2.11.8",
     "lit": "^3.2.0",
     "luxon": "^3.5.0"

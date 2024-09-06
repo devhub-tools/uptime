@@ -6,6 +6,7 @@ defmodule UptimeWeb.ServiceLive do
 
   import UptimeWeb.BadgeComponents
 
+  alias Phoenix.LiveView.AsyncResult
   alias UptimeWeb.Utils
 
   @show_checks_since DateTime.add(DateTime.utc_now(), -24, :hour)
@@ -15,21 +16,25 @@ defmodule UptimeWeb.ServiceLive do
     initial_limit = 50
     service = Uptime.get_service_by_slug!(slug, enabled: true, preload_checks: true, limit_checks: initial_limit)
 
-    socket =
-      assign(socket,
-        page_title: service.name,
-        show_checks_since: @show_checks_since,
-        show_checks_until: @show_checks_until,
-        slug: slug,
-        service: service,
-        total: initial_limit
-      )
-
-    if connected?(socket) do
-      Uptime.subscribe_checks(service.id)
-    end
-
-    {:ok, socket}
+    socket
+    |> assign(
+      page_title: service.name,
+      show_checks_since: @show_checks_since,
+      show_checks_until: @show_checks_until,
+      slug: slug,
+      service: service,
+      total: initial_limit,
+      chart_data: AsyncResult.loading()
+    )
+    |> then(fn socket ->
+      if connected?(socket) do
+        Uptime.subscribe_checks(service.id)
+        fetch_chart_data(socket)
+      else
+        socket
+      end
+    end)
+    |> ok()
   end
 
   def render(assigns) do
@@ -61,6 +66,11 @@ defmodule UptimeWeb.ServiceLive do
         window_ended_at={@show_checks_until}
         total={@total}
       />
+      <div id="charts" phx-hook="Chart" class="mt-12">
+        <div class="flex h-72">
+          <canvas id="service-history-chart"></canvas>
+        </div>
+      </div>
     </div>
     """
   end
@@ -100,5 +110,20 @@ defmodule UptimeWeb.ServiceLive do
     unless checks == [] do
       checks |> Enum.at(0) |> Map.get(:status) == :success
     end
+  end
+
+  def handle_async(:chart_data, {:ok, data}, socket) do
+    socket
+    |> assign(chart_data: AsyncResult.ok(socket.assigns.chart_data, data))
+    |> push_event("create_chart", data)
+    |> noreply()
+  end
+
+  defp fetch_chart_data(socket) do
+    %{service: service} = socket.assigns
+
+    start_async(socket, :chart_data, fn ->
+      Uptime.service_history_chart(service, ~U[2024-09-01 00:00:00Z], ~U[2024-12-01 00:00:00Z])
+    end)
   end
 end
