@@ -87,7 +87,7 @@ defmodule UptimeWeb.AppComponents do
         :success -> "border-2 border-success bg-success group-hover/color-bar:border-primary"
         :pending -> "border-2 border-warn bg-warn group-hover/color-bar:border-primary"
         :failure -> "border-2 border-destructive bg-destructive group-hover/color-bar:border-primary"
-        _ -> "border-2 border-muted bg-muted group-hover/color-bar:border-primary"
+        _unknown -> "border-2 border-muted bg-muted group-hover/color-bar:border-primary"
       end
 
     card_class =
@@ -95,7 +95,7 @@ defmodule UptimeWeb.AppComponents do
         :success -> "border-success"
         :pending -> "border-warn"
         :failure -> "border-destructive"
-        _ -> "border-muted"
+        _unknown -> "border-muted"
       end
 
     assigns =

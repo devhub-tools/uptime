@@ -56,15 +56,16 @@ defmodule Uptime.Env do
     |> read_from_config_file()
     |> case do
       {:ok, services} -> services
-      _ -> []
+      _error -> []
     end
-    |> Enum.map(&Map.new(&1, fn {k, v} -> {String.downcase(k), v} end))
-    |> Enum.map(
-      &Map.new(&1, fn
+    |> Enum.map(fn service ->
+      service
+      |> Map.new(fn {k, v} -> {String.downcase(k), v} end)
+      |> Map.new(fn
         {"expected_status_code" = k, v} when is_integer(v) -> {k, Integer.to_string(v)}
         pair -> pair
       end)
-    )
+    end)
   end
 
   defp read_services_from_env do
@@ -77,7 +78,7 @@ defmodule Uptime.Env do
         |> String.split("_")
         |> case do
           [@prefix, "SERVICE", index | _name] -> @prefix <> "_SERVICE_" <> index
-          _ -> nil
+          _invalid -> nil
         end
       end,
       fn var ->
@@ -85,7 +86,7 @@ defmodule Uptime.Env do
         |> String.split("_")
         |> case do
           [@prefix, "SERVICE", _index | name] -> Enum.join(name, "_")
-          _ -> nil
+          _invalid -> nil
         end
       end
     )
