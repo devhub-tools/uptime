@@ -5,12 +5,19 @@ defmodule Uptime do
   use Injexor, inject: [Uptime.Storage]
 
   alias Uptime.Check
+  alias Uptime.CheckJob
   alias Uptime.Storage
 
   @callback get_service!(String.t()) :: Service.t()
   @callback get_service!(String.t(), Keyword.t()) :: Service.t()
   def get_service!(id, opts \\ []) do
     Storage.get_service!(id, opts)
+  end
+
+  @callback get_service_by_slug!(String.t()) :: Service.t()
+  @callback get_service_by_slug!(String.t(), Keyword.t()) :: Service.t()
+  def get_service_by_slug!(slug, opts \\ []) do
+    Storage.get_service_by_slug!(slug, opts)
   end
 
   @callback list_services() :: [Service.t()]
@@ -24,6 +31,17 @@ defmodule Uptime do
     attrs
     |> Storage.save_check!()
     |> tap(&broadcast!/1)
+  end
+
+  @callback save_service(map()) :: {:ok, Uptime.Service.t()} | {:error, Ecto.Changeset.t()}
+  def save_service(attrs) do
+    case Storage.save_service(attrs) do
+      {:ok, service} ->
+        %{id: service.id} |> CheckJob.new(scheduled_at: DateTime.utc_now()) |> Oban.insert()
+
+      error ->
+        error
+    end
   end
 
   @spec subscribe_checks() :: :ok | {:error, term()}

@@ -7,11 +7,12 @@ defmodule UptimeWeb.ServiceLive do
   @show_checks_since DateTime.add(DateTime.utc_now(), -24, :hour)
   @show_checks_until DateTime.utc_now()
 
-  def mount(%{"id" => id}, _session, socket) do
-    service = Uptime.get_service!(id, enabled: true, preload_checks: true, limit_checks: 50)
+  def mount(%{"slug" => slug}, _session, socket) do
+    service = Uptime.get_service_by_slug!(slug, enabled: true, preload_checks: true, limit_checks: 50)
 
     socket =
       socket
+      |> assign(page_title: service.name)
       |> assign(show_checks_since: @show_checks_since)
       |> assign(show_checks_until: @show_checks_until)
       |> assign(service: service)
@@ -26,10 +27,12 @@ defmodule UptimeWeb.ServiceLive do
   def render(assigns) do
     ~H"""
     <div class="max-w-5xl mx-auto mt-6 space-y-6">
+      <.back navigate={~p"/"} text="View all" />
       <.service_checks_summary
         service={@service}
         window_started_at={@show_checks_since}
         window_ended_at={@show_checks_until}
+        total={50}
       />
       <div>
         TODO: More details about the checks for this service...

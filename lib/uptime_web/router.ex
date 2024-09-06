@@ -10,6 +10,9 @@ defmodule UptimeWeb.Router do
   @csp_img_src "img-src data: w3.org/svg/2000 'self'"
   @csp_font_src "font-src 'self' fonts.gstatic.com"
   @csp_style_src "style-src 'self' fonts.googleapis.com"
+  if Env.config_env() == :dev do
+    @csp_style_src @csp_style_src <> " 'unsafe-inline'"
+  end
 
   @csp "#{@csp_default_src}; #{@csp_connect_src}; #{@csp_frame_src}; #{@csp_script_src}; #{@csp_img_src}; #{@csp_font_src}; #{@csp_style_src}"
 
@@ -31,7 +34,7 @@ defmodule UptimeWeb.Router do
     pipe_through :browser
 
     live "/", DashboardLive, :index
-    live "/:id", ServiceLive, :index
+    live "/:slug", ServiceLive, :index
   end
 
   # Other scopes may use custom stacks.

@@ -1,0 +1,19 @@
+# Development configuration
+---
+services:
+  - name: google
+    url: https://www.google.com
+    expected_status_code: 200
+  - name: github
+    url: https://github.com
+    expected_status_code: 200
+  - enabled: false
+    name: forums
+    url: https://elixirforum.com
+    expected_status_code: 2xx
+  - name: package manager
+    url: https://hex.pm
+    expected_status_code: 200
+  - name: localhost:4000
+    url: http://localhost:4000
+    expected_status_code: 200
