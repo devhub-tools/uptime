@@ -19,6 +19,8 @@ defmodule UptimeWeb.ServiceLive do
     socket
     |> assign(
       page_title: service.name,
+      start_date: DateTime.add(DateTime.utc_now(), -90, :day),
+      end_date: DateTime.utc_now(),
       show_checks_since: @show_checks_since,
       show_checks_until: @show_checks_until,
       slug: slug,
@@ -66,11 +68,21 @@ defmodule UptimeWeb.ServiceLive do
         window_ended_at={@show_checks_until}
         total={@total}
       />
-      <div id="charts" phx-hook="Chart" class="mt-12">
-        <div class="flex h-72">
-          <canvas id="service-history-chart"></canvas>
+      <%!-- TODO: Needs date filter inputs for start/end_date --%>
+      <.async_result assign={@chart_data}>
+        <:loading>
+          <div class="flex items-center justify-center h-72">
+            <div class="h-10 w-10">
+              <.spinner />
+            </div>
+          </div>
+        </:loading>
+        <div id="charts" phx-hook="Chart" class="mt-12">
+          <div class="flex h-72">
+            <canvas id="service-history-chart"></canvas>
+          </div>
         </div>
-      </div>
+      </.async_result>
     </div>
     """
   end
@@ -120,10 +132,10 @@ defmodule UptimeWeb.ServiceLive do
   end
 
   defp fetch_chart_data(socket) do
-    %{service: service} = socket.assigns
+    %{service: service, start_date: start_date, end_date: end_date} = socket.assigns
 
     start_async(socket, :chart_data, fn ->
-      Uptime.service_history_chart(service, ~U[2024-09-01 00:00:00Z], ~U[2024-12-01 00:00:00Z])
+      Uptime.service_history_chart(service, start_date, end_date)
     end)
   end
 end
