@@ -31,7 +31,7 @@ defmodule UptimeWeb.Router do
   end
 
   scope "/v1/api", UptimeWeb.Controllers do
-    get "/services/:id/uptimes/:duration/badge.svg", BadgeController, :uptime
+    get "/services/:slug/uptimes/:duration/badge.svg", BadgeController, :uptime
   end
 
   scope "/", UptimeWeb do
