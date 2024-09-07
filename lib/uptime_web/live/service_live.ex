@@ -4,6 +4,8 @@ defmodule UptimeWeb.ServiceLive do
   """
   use UptimeWeb, :live_view
 
+  import UptimeWeb.BadgeComponents
+
   alias UptimeWeb.Utils
 
   @show_checks_since DateTime.add(DateTime.utc_now(), -24, :hour)
@@ -37,18 +39,18 @@ defmodule UptimeWeb.ServiceLive do
         <.back navigate={~p"/"} text="View all" />
         <div class="flex flex-row flex-wrap space-x-4">
           <div>
-            <.link href={"/services/#{@service.slug}/uptimes/#{"7d"}/badge.svg"}>
-              <.uptime_badge duration="7d" uptime={0.90} />
+            <.link href={"/v1/badges/services/#{@service.slug}/uptimes/#{"7d"}/badge.svg"}>
+              <.uptime duration="7d" uptime={0.90} />
             </.link>
           </div>
           <div>
-            <.link href={"/services/#{@service.slug}/uptimes/#{"7d"}/badge.svg"}>
-              <.response_time_badge duration="7d" average_response_time={170} />
+            <.link href={"/v1/badges/services/#{@service.slug}/times/#{"7d"}/badge.svg"}>
+              <.response_time duration="7d" average_response_time={170} />
             </.link>
           </div>
           <div>
-            <.link href={"/services/#{@service.slug}/uptimes/#{"7d"}/badge.svg"}>
-              <.health_badge up={latest_checks_success(@service.checks)} />
+            <.link href={"/v1/badges/services/#{@service.slug}/health/badge.svg"}>
+              <.health up={latest_checks_success(@service.checks)} />
             </.link>
           </div>
         </div>

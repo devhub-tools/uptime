@@ -30,8 +30,20 @@ defmodule UptimeWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/v1/api", UptimeWeb.Controllers do
+  pipeline :badges do
+    plug :accepts, ["html"]
+  end
+
+  # scope "/v1/api", UptimeWeb do
+  #   pipe_through :api
+  # end
+
+  scope "/v1/badges", UptimeWeb do
+    pipe_through :badges
+
     get "/services/:slug/uptimes/:duration/badge.svg", BadgeController, :uptime
+    get "/services/:slug/times/:duration/badge.svg", BadgeController, :response_time
+    get "/services/:slug/health/badge.svg", BadgeController, :health
   end
 
   scope "/", UptimeWeb do
@@ -41,12 +53,6 @@ defmodule UptimeWeb.Router do
     live "/:slug", ServiceLive, :index
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", UptimeWeb do
-  #   pipe_through :api
-  # end
-
-  # Enable LiveDashboard in development
   if Application.compile_env(:uptime, :dev_routes) do
     # If you want to use the LiveDashboard in production, you should put
     # it behind authentication and allow only admins to access it.
