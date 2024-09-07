@@ -16,7 +16,8 @@ defmodule UptimeWeb.DashboardLive do
         socket,
         show_checks_since: @show_checks_since,
         show_checks_until: @show_checks_until,
-        services: []
+        services: [],
+        total: 50
       )
 
     if connected?(socket) do
@@ -43,7 +44,7 @@ defmodule UptimeWeb.DashboardLive do
           service={service}
           window_started_at={@show_checks_since}
           window_ended_at={@show_checks_until}
-          href={~p"/#{service.slug}"}
+          navigate={~p"/#{service.slug}"}
           total={@total}
         />
       <% end %>

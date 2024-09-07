@@ -15,7 +15,7 @@ defmodule UptimeWeb.AppComponents do
   attr :total, :integer, required: true
   attr :window_started_at, :map, default: nil
   attr :window_ended_at, :map, default: nil
-  attr :href, :string, default: nil
+  attr :navigate, :string, default: nil
 
   def service_checks_summary(assigns) do
     since =
@@ -44,8 +44,8 @@ defmodule UptimeWeb.AppComponents do
       <div class="flex flex-row items-center justify-between">
         <div class="flex flex-row items-center">
           <h2 class="text-lg font-semibold mr-2">
-            <%= if not is_nil(@href) do %>
-              <.link navigate={@href} class="hover:underline">
+            <%= if not is_nil(@navigate) do %>
+              <.link navigate={@navigate} class="hover:underline">
                 <%= @name %>
               </.link>
             <% else %>
