@@ -40,7 +40,7 @@ defmodule UptimeWeb do
   def controller do
     quote do
       use Phoenix.Controller,
-        formats: [:html, :json, :svg],
+        formats: [:html, :json],
         layouts: [html: UptimeWeb.Layouts]
 
       use Gettext, backend: UptimeWeb.Gettext

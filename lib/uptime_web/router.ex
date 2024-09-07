@@ -32,6 +32,7 @@ defmodule UptimeWeb.Router do
 
   pipeline :badges do
     plug :accepts, ["html"]
+    plug :put_secure_browser_headers, %{"content-security-policy" => @csp}
   end
 
   # scope "/v1/api", UptimeWeb do
