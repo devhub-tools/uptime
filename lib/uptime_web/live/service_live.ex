@@ -13,8 +13,8 @@ defmodule UptimeWeb.ServiceLive do
   @show_checks_until DateTime.utc_now()
 
   def mount(%{"slug" => slug}, _session, socket) do
-    initial_limit = 50
-    service = Uptime.get_service_by_slug!(slug, enabled: true, preload_checks: true, limit_checks: initial_limit)
+    initial_check_limit = 50
+    service = Uptime.get_service_by_slug!(slug, enabled: true, preload_checks: true, limit_checks: initial_check_limit)
 
     socket
     |> assign(
@@ -25,7 +25,7 @@ defmodule UptimeWeb.ServiceLive do
       show_checks_until: @show_checks_until,
       slug: slug,
       service: service,
-      total: initial_limit,
+      check_limit: initial_check_limit,
       chart_data: AsyncResult.loading()
     )
     |> then(fn socket ->
@@ -41,7 +41,7 @@ defmodule UptimeWeb.ServiceLive do
 
   def render(assigns) do
     ~H"""
-    <div id="window-resize" phx-hook="WindowResize" class="space-y-6">
+    <div class="space-y-9">
       <div class="flex flex-col sm:flex-row justify-between sm:items-center flex-wrap space-y-4 sm:space-y-0">
         <.back navigate={~p"/"} text="View all" />
         <div class="flex flex-row flex-wrap space-x-4">
@@ -62,24 +62,26 @@ defmodule UptimeWeb.ServiceLive do
           </div>
         </div>
       </div>
-      <.service_checks_summary
-        service={@service}
-        window_started_at={@show_checks_since}
-        window_ended_at={@show_checks_until}
-        total={@total}
-      />
+      <div id="window-resize" phx-hook="WindowResize">
+        <.service_checks_summary
+          service={@service}
+          window_started_at={@show_checks_since}
+          window_ended_at={@show_checks_until}
+          total={@check_limit}
+        />
+      </div>
       <%!-- TODO: Needs date filter inputs for start/end_date --%>
       <.async_result assign={@chart_data}>
         <:loading>
           <div class="flex items-center justify-center h-72">
             <div class="h-10 w-10">
-              <.spinner />
+              <.loader />
             </div>
           </div>
         </:loading>
-        <div id="charts" phx-hook="Chart" class="mt-12">
+        <div id="charts" phx-hook="Chart">
           <div class="flex h-72">
-            <canvas id="service-history-chart"></canvas>
+            <canvas id="service-history-chart" />
           </div>
         </div>
       </.async_result>
@@ -87,35 +89,35 @@ defmodule UptimeWeb.ServiceLive do
     """
   end
 
+  @doc """
+  Handle new checks, keep the list fixed to a calculated amount by removing the last element.
+  """
   def handle_info({Uptime.Check, %Uptime.Check{} = check}, socket) do
-    service = socket.assigns.service
+    %{service: %{checks: checks} = service, check_limit: check_limit} = socket.assigns
+    checks = if length(checks) >= check_limit, do: List.delete_at(checks, -1), else: checks
 
-    checks =
-      if length(service.checks) >= socket.assigns.total do
-        # Keep the checks list fixed to calculated amount due to screen width contraints
-        List.delete_at(service.checks, -1)
-      else
-        service.checks
-      end
-
-    checks = [check | checks]
-    updated_service = %{service | checks: checks}
-    {:noreply, assign(socket, service: updated_service)}
+    socket
+    |> assign(service: %{service | checks: [check | checks]})
+    |> noreply()
   end
 
   def handle_event("window_resize", values, socket) do
-    width = Map.get(values, "width", 800)
-    total = Utils.calculate_checks_limit(width)
+    check_limit = values |> Map.get("width", 800) |> Utils.calculate_checks_limit()
 
-    socket =
-      socket
-      |> assign(
-        service:
-          Uptime.get_service_by_slug!(socket.assigns.slug, enabled: true, preload_checks: true, limit_checks: total)
+    service =
+      Uptime.get_service_by_slug!(
+        socket.assigns.slug,
+        enabled: true,
+        preload_checks: true,
+        limit_checks: check_limit
       )
-      |> assign(:total, total)
 
-    {:noreply, socket}
+    socket
+    |> assign(
+      service: service,
+      check_limit: check_limit
+    )
+    |> noreply()
   end
 
   def latest_checks_success(checks) do
@@ -128,6 +130,13 @@ defmodule UptimeWeb.ServiceLive do
     socket
     |> assign(chart_data: AsyncResult.ok(socket.assigns.chart_data, data))
     |> push_event("create_chart", data)
+    |> noreply()
+  end
+
+  def handle_async(:chart_data, {:exit, reason}, socket) do
+    socket
+    |> assign(chart_data: AsyncResult.failed(socket.assigns.chart_data, {:exit, reason}))
+    |> put_flash(:error, "Failed to load chart")
     |> noreply()
   end
 

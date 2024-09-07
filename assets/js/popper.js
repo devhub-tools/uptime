@@ -1,7 +1,7 @@
 import { createPopper } from "@popperjs/core";
 
 // A class to manage the tooltip lifecycle.
-export class Tooltip {
+class Tooltip {
   showEvents = ["mouseenter", "focus"];
   hideEvents = ["mouseleave", "blur"];
   $parent;
@@ -57,3 +57,15 @@ export class Tooltip {
     this.popperInstance?.destroy();
   }
 }
+
+export const TooltipHook = {
+  mounted() {
+    this.el.tooltip = new Tooltip(this.el);
+  },
+  updated() {
+    this.el.tooltip?.update();
+  },
+  destroyed() {
+    this.el.tooltip?.destroy();
+  },
+};

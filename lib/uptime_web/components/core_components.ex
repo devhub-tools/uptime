@@ -19,7 +19,7 @@ defmodule UptimeWeb.CoreComponents do
 
   alias Phoenix.LiveView.JS
 
-  def spinner(assigns) do
+  def loader(assigns) do
     ~H"""
     <svg
       class="animate-spin -ml-1 mr-3 h-full w-full text-black"

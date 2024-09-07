@@ -5,26 +5,16 @@ import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import topbar from "../vendor/topbar";
 import "./format-date";
-import { Tooltip } from "./popper";
+import { TooltipHook } from "./popper";
 import { WindowResizeHook } from "./window-resize";
 import { ThemeToggleHook } from "./theme-toggle";
-import { CreateChartHook } from "./charting";
+import { ChartHook } from "./charts";
 
 const Hooks = {
-  Tooltip: {
-    mounted() {
-      this.el.tooltip = new Tooltip(this.el);
-    },
-    updated() {
-      this.el.tooltip?.update();
-    },
-    destroyed() {
-      this.el.tooltip?.destroy();
-    },
-  },
+  Tooltip: TooltipHook,
   WindowResize: WindowResizeHook,
   ThemeToggle: ThemeToggleHook,
-  Chart: CreateChartHook,
+  Chart: ChartHook,
 };
 
 const csrfToken = document
