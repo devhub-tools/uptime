@@ -11,7 +11,16 @@ export class Tooltip {
   constructor($tooltip) {
     this.$tooltip = $tooltip;
     this.$parent = $tooltip.parentElement;
-    this.popperInstance = createPopper(this.$parent, $tooltip);
+    this.popperInstance = createPopper(this.$parent, $tooltip, {
+      modifiers: [
+        {
+          name: "offset",
+          options: {
+            offset: [0, 5],
+          },
+        },
+      ],
+    });
     this.destructors = [];
     this.showEvents.forEach((event) => {
       const callback = this.show.bind(this);

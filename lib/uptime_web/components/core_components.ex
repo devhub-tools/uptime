@@ -75,8 +75,8 @@ defmodule UptimeWeb.CoreComponents do
       id={@id}
       phx-hook="Tooltip"
       class={[
-        "hovercard bg-white absolute hidden group-hover/hover-card:block",
-        "z-50 rounded-md border p-4 shadow-md outline-none",
+        "hovercard bg-popover text-popover-foreground absolute hidden group-hover/hover-card:block",
+        "z-50 rounded-md border border-border p-4 shadow-md outline-none",
         @class
       ]}
       {@rest}
@@ -184,8 +184,9 @@ defmodule UptimeWeb.CoreComponents do
       role="alert"
       class={[
         "fixed top-2 right-2 mr-2 w-80 sm:w-96 z-50 rounded-lg p-3 ring-1",
-        @kind == :info && "bg-emerald-50 text-emerald-800 ring-emerald-500 fill-cyan-900",
-        @kind == :error && "bg-rose-50 text-rose-900 shadow-md ring-rose-500 fill-rose-900"
+        @kind == :info && "bg-success text-primary-foreground ring-emerald-500 fill-cyan-900",
+        @kind == :error &&
+          "bg-destructive text-primary-foreground shadow-md ring-rose-500 fill-rose-900"
       ]}
       {@rest}
     >
@@ -266,17 +267,17 @@ defmodule UptimeWeb.CoreComponents do
       <.back navigate={~p"/posts"}>Back to posts</.back>
   """
   attr :navigate, :any, required: true
-  slot :inner_block, required: true
+  attr :rest, :global
+  attr :text, :string, default: nil
 
   def back(assigns) do
     ~H"""
-    <div class="mt-16">
-      <.link
-        navigate={@navigate}
-        class="text-sm font-semibold leading-6 text-zinc-900 hover:text-zinc-700"
-      >
+    <div {@rest}>
+      <.link navigate={@navigate} class="text-sm font-semibold leading-6 text-foreground">
         <.icon name="hero-arrow-left-solid" class="h-3 w-3" />
-        <%= render_slot(@inner_block) %>
+        <%= if @text do %>
+          <span class="hover:underline"><%= @text %></span>
+        <% end %>
       </.link>
     </div>
     """

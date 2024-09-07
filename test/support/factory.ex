@@ -6,6 +6,7 @@ defmodule Uptime.Factory do
     %Uptime.Service{
       id: UXID.generate!(prefix: "svc"),
       name: "Example Service",
+      slug: "example-service",
       method: "GET",
       url: "https://example.com",
       enabled: true,

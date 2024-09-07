@@ -37,13 +37,14 @@ defmodule UptimeWeb.DashboardLive do
 
   def render(assigns) do
     ~H"""
-    <div id="window-resize" phx-hook="WindowResize">
+    <div id="window-resize" phx-hook="WindowResize" class="space-y-6">
       <%= for service <- @services do %>
         <.service_checks_summary
           service={service}
           window_started_at={@show_checks_since}
           window_ended_at={@show_checks_until}
-          href={~p"/#{service.id}"}
+          href={~p"/#{service.slug}"}
+          total={@total}
         />
       <% end %>
     </div>
@@ -58,8 +59,15 @@ defmodule UptimeWeb.DashboardLive do
         {:noreply, socket}
 
       service ->
-        # Keep the checks list fixed to calculated amount due to screen width contraints
-        checks = [check | List.delete_at(service.checks, -1)]
+        checks =
+          if length(service.checks) >= socket.assigns.total do
+            # Keep the checks list fixed to calculated amount due to screen width contraints
+            List.delete_at(service.checks, -1)
+          else
+            service.checks
+          end
+
+        checks = [check | checks]
         updated_service = %{service | checks: checks}
 
         updated_services =
@@ -71,7 +79,13 @@ defmodule UptimeWeb.DashboardLive do
 
   def handle_event("window_resize", values, socket) do
     width = Map.get(values, "width", 800)
-    socket = assign(socket, services: list_services(Utils.calculate_checks_limit(width)))
+    total = Utils.calculate_checks_limit(width)
+
+    socket =
+      socket
+      |> assign(services: list_services(total))
+      |> assign(:total, total)
+
     {:noreply, socket}
   end
 

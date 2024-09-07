@@ -2,6 +2,8 @@ defmodule UptimeWeb.FormComponents do
   @moduledoc false
   use Phoenix.Component
 
+  import UptimeWeb.Components.Helpers
+
   alias Phoenix.LiveView.JS
 
   @doc """
@@ -33,7 +35,8 @@ defmodule UptimeWeb.FormComponents do
     <button
       type={@type}
       class={[
-        "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50",
+        "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50",
+        focus_class(),
         @variant_class,
         @class
       ]}

@@ -29,8 +29,10 @@ config :uptime, Oban,
   engine: Oban.Engines.Basic,
   queues: [default: 10],
   repo: Uptime.Repo,
-  # related: https://hexdocs.pm/oban/troubleshooting.html#jobs-stuck-available-and-won-t-execute
-  plugins: [Oban.Plugins.Lifeline],
+  plugins: [
+    # related: https://hexdocs.pm/oban/troubleshooting.html#jobs-stuck-available-and-won-t-execute
+    {Oban.Plugins.Lifeline, rescue_after: to_timeout(minute: 1)}
+  ],
   shutdown_grace_period: :timer.seconds(30)
 
 config :uptime, Uptime.Repo,
@@ -48,6 +50,7 @@ config :uptime, UptimeWeb.Endpoint,
   live_view: [signing_salt: "GoHR/4L6"]
 
 config :uptime,
+  env: config_env(),
   ecto_repos: [Uptime.Repo],
   generators: [timestamp_type: :utc_datetime_usec, binary_id: true],
   build_version: System.get_env("BUILD_VERSION", "dev")

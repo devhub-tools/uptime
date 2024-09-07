@@ -7,4 +7,6 @@ defmodule UptimeWeb.Components.Helpers do
   def unique_id do
     16 |> :crypto.strong_rand_bytes() |> Base.encode16()
   end
+
+  def focus_class, do: "focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-1"
 end

@@ -22,14 +22,35 @@ defmodule Uptime.Storage do
     |> Repo.one!()
   end
 
+  @callback get_service_by_slug!(String.t(), Keyword.t()) :: Service.t()
+  def get_service_by_slug!(slug, opts) do
+    %{preload_checks: preload_checks, limit_checks: limit_checks} = service_query_opts(opts)
+
+    from(s in Service, where: s.slug == ^slug)
+    |> maybe_preload_checks(preload_checks, limit_checks)
+    |> Repo.one!()
+  end
+
   @callback list_services(Keyword.t()) :: [Service.t()]
   def list_services(opts) do
     %{enabled: enabled, preload_checks: preload_checks, limit_checks: limit_checks} = service_query_opts(opts)
 
     from(Service)
     |> maybe_where(:enabled, enabled)
+    |> order_by(asc: :name)
     |> Repo.all()
     |> maybe_preload_checks(preload_checks, limit_checks)
+  end
+
+  @spec save_service(map()) :: Service.t()
+  def save_service(attrs) do
+    attrs
+    |> Service.changeset()
+    |> Repo.insert(
+      on_conflict: {:replace_all_except, [:id, :inserted_at]},
+      conflict_target: :slug,
+      returning: false
+    )
   end
 
   ###
