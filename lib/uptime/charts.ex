@@ -3,6 +3,14 @@ defmodule Uptime.Charts do
 
   alias Uptime.Storage
 
+  @colors %{
+    dns: "hsl(12 76% 61%)",
+    connect: "hsl(173 58% 39%)",
+    tls: "hsl(197 37% 24%)",
+    first_byte: "hsl(43 74% 66%)",
+    finish: "hsl(27 87% 67%)"
+  }
+
   def service_history(service, start_date, end_date) do
     data = Storage.service_chart_history(service, start_date, end_date)
 
@@ -15,40 +23,35 @@ defmodule Uptime.Charts do
         %{
           label: "DNS",
           data: Enum.map(data, & &1.dns_time),
-          borderColor: "#FFA500",
-          backgroundColor: "#FFD580",
+          backgroundColor: @colors.dns,
           fill: true
         },
         %{
           label: "Connect",
           data: Enum.map(data, & &1.connect_time),
-          borderColor: "#FF0000",
-          backgroundColor: "#FF8080",
+          backgroundColor: @colors.connect,
           fill: true
         },
         %{
           label: "TLS",
           data: Enum.map(data, & &1.tls_time),
-          borderColor: "#0000FF",
-          backgroundColor: "#8080FF",
+          backgroundColor: @colors.tls,
           fill: true
         },
         %{
           label: "First Byte",
           data: Enum.map(data, & &1.first_byte_time),
-          borderColor: "#008000",
-          backgroundColor: "#80C080",
+          backgroundColor: @colors.first_byte,
           fill: true
         },
         %{
           label: "Finish",
           data: Enum.map(data, & &1.request_time),
-          borderColor: "#800080",
-          backgroundColor: "#C080C0",
+          backgroundColor: @colors.finish,
           fill: true
         }
       ],
-      unit: "Latency"
+      unit: "ms"
     }
   end
 end

@@ -28,10 +28,12 @@ defmodule UptimeWeb.ServiceLive do
       check_limit: initial_check_limit,
       chart_data: AsyncResult.loading()
     )
+    |> fetch_chart_data()
     |> then(fn socket ->
       if connected?(socket) do
         Uptime.subscribe_checks(service.id)
-        fetch_chart_data(socket)
+        # fetch_chart_data(socket)
+        socket
       else
         socket
       end
@@ -81,7 +83,7 @@ defmodule UptimeWeb.ServiceLive do
         </:loading>
         <div id="charts" phx-hook="Chart">
           <div class="flex h-72">
-            <canvas id="service-history-chart" />
+            <canvas id="service-history-chart" phx-update="ignore" />
           </div>
         </div>
       </.async_result>

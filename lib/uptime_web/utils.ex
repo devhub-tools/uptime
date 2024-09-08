@@ -20,6 +20,6 @@ defmodule UptimeWeb.Utils do
     |> Decimal.from_float()
     |> Decimal.round(0)
     |> Decimal.to_integer()
-    |> max(20)
+    |> max(30)
   end
 end

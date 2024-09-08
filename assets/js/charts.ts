@@ -13,7 +13,7 @@ Chart.defaults.color = "#000";
 type ChartJSHook = {
   id?: string;
   destroyIfPresent(): void;
-  createChart(options: Options): Chart | undefined;
+  createChart(canvas: HTMLCanvasElement, options: Options): Chart | undefined;
 } & Hook;
 
 type Options = {
@@ -32,6 +32,14 @@ type Options = {
 
 type ChartCanvas = HTMLCanvasElement & { chart?: Chart };
 
+const getBodyColor = () => {
+  const body = document.querySelector("body");
+  if (body instanceof HTMLElement) {
+    return window.getComputedStyle(body).color;
+  }
+  return "#000";
+};
+
 const isCanvas = (el: HTMLElement | null): el is HTMLCanvasElement =>
   el instanceof HTMLCanvasElement;
 const hasChart = (canvas: HTMLElement | null): canvas is ChartCanvas =>
@@ -47,12 +55,22 @@ export const ChartHook: ChartJSHook = {
         if (isCanvas(canvas)) {
           this.id = data.id;
           this.destroyIfPresent();
-          (canvas as ChartCanvas).chart = this.createChart(data);
+          const c = canvas as ChartCanvas;
+          c.chart = this.createChart(canvas, data);
+          // update axis colors on theme change
+          const themeToggle = document.getElementById("theme-toggle");
+          if (themeToggle instanceof HTMLButtonElement) {
+            themeToggle.addEventListener("click", () => {
+              if (c.chart?.options.scales?.y?.ticks) {
+                c.chart.options.scales.y.ticks.color = getBodyColor();
+                c.chart?.update();
+              }
+            });
+          }
         }
       });
     }
   },
-  // Phoenix lifecycle method on unmount
   destroyed() {
     this.destroyIfPresent();
   },
@@ -62,7 +80,7 @@ export const ChartHook: ChartJSHook = {
       canvas.chart.destroy();
     }
   },
-  createChart(options: Options) {
+  createChart(canvas: HTMLCanvasElement, options: Options) {
     const {
       id,
       datasets,
@@ -75,64 +93,71 @@ export const ChartHook: ChartJSHook = {
       displayLegend = false,
       stacked = false,
     } = options;
-    const canvas = this.id ? document.getElementById(this.id) : null;
-    if (isCanvas(canvas)) {
-      return new Chart(canvas, {
-        type,
-        data: {
-          labels,
-          datasets: datasets || [
-            {
-              data,
+    return new Chart(canvas, {
+      type,
+      data: {
+        labels,
+        datasets: datasets || [
+          {
+            data,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            ticks: {
+              display: false,
             },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            x: {
-              ticks: { maxRotation: 0 },
-              grid: { display: false },
-              title: {
-                display: true,
-                text: unit,
-                font: { size: 10 },
-                color: "#000",
+            border: {
+              display: true,
+              color: "hsl(25 5.3% 44.7%)",
+            },
+            stacked,
+          },
+          y: {
+            ticks: {
+              maxTicksLimit: 3,
+              callback: (value, _index, _ticks) => value + unit,
+              color: getBodyColor(),
+              font: {
+                size: 11,
               },
-              stacked,
             },
-            y: {
-              ticks: { maxTicksLimit: 4 },
-              max,
-              border: {
-                display: false,
-              },
-              stacked,
+            max,
+            grid: {
+              display: false,
             },
-          },
-          plugins: {
-            legend: { display: displayLegend, position: "bottom" },
-          },
-          onClick: (_event: ChartEvent, elements: ActiveElement[]) => {
-            if (elements.length > 0) {
-              const firstElement = elements[0];
-              const dataIndex = firstElement.index;
-              const link = links[dataIndex];
-              if (link && view.pushEvent)
-                view.pushEvent("navigate", {
-                  path: link + window.location.search,
-                });
-            }
-          },
-          onHover: (event: ChartEvent, elements: ActiveElement[]) => {
-            const target = event.native?.target;
-            if (target && target instanceof HTMLElement) {
-              target.style.cursor = elements[0] ? "pointer" : "default";
-            }
+            border: {
+              display: true,
+              color: "hsl(25 5.3% 44.7%)",
+            },
+            stacked,
           },
         },
-      });
-    }
+        plugins: {
+          legend: { display: displayLegend, position: "bottom" },
+        },
+        onClick: (_event: ChartEvent, elements: ActiveElement[]) => {
+          if (elements.length > 0) {
+            const firstElement = elements[0];
+            const dataIndex = firstElement.index;
+            const link = links[dataIndex];
+            if (link && this.pushEvent)
+              this.pushEvent("navigate", {
+                path: link + window.location.search,
+              });
+          }
+        },
+        onHover: (event: ChartEvent, elements: ActiveElement[]) => {
+          const target = event.native?.target;
+          if (target && target instanceof HTMLElement) {
+            target.style.cursor = elements[0] ? "pointer" : "default";
+          }
+        },
+      },
+    });
   },
 };
