@@ -4,10 +4,14 @@ defmodule Uptime do
 
   use Injexor, inject: [Uptime.Storage]
 
+  alias Uptime.Charts
   alias Uptime.Check
   alias Uptime.CheckJob
   alias Uptime.Storage
 
+  ###
+  ### Services
+  ###
   @callback get_service!(String.t()) :: Service.t()
   @callback get_service!(String.t(), Keyword.t()) :: Service.t()
   def get_service!(id, opts \\ []) do
@@ -26,6 +30,13 @@ defmodule Uptime do
     Storage.list_services(opts)
   end
 
+  def service_history_chart(service, start_date, end_date) do
+    Charts.service_history(service, start_date, end_date)
+  end
+
+  ###
+  ### Checks
+  ###
   @callback save_check!(map()) :: Uptime.Check.t()
   def save_check!(attrs) do
     attrs
@@ -45,6 +56,9 @@ defmodule Uptime do
     end
   end
 
+  ###
+  ### PubSub
+  ###
   @spec subscribe_checks() :: :ok | {:error, term()}
   def subscribe_checks do
     Phoenix.PubSub.subscribe(Uptime.PubSub, check_topic())

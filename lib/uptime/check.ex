@@ -30,6 +30,7 @@ defmodule Uptime.Check do
     field :tls_time, :integer
     field :first_byte_time, :integer
     field :request_time, :integer
+    field :time_since_last_check, :integer
 
     belongs_to :service, Uptime.Service
 
@@ -47,10 +48,12 @@ defmodule Uptime.Check do
       :tls_time,
       :first_byte_time,
       :request_time,
-      :service_id
+      :service_id,
+      :time_since_last_check
     ])
     |> validate_required([
-      :status
+      :status,
+      :time_since_last_check
     ])
   end
 end

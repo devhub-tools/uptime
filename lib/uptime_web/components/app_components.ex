@@ -120,11 +120,21 @@ defmodule UptimeWeb.AppComponents do
           <p>
             <span class="font-semibold">Status code</span>: <%= @check.status_code %>
           </p>
-          <p><span class="font-semibold">DNS time</span>: <%= @check.dns_time %>ms</p>
-          <p><span class="font-semibold">TLS time</span>: <%= @check.tls_time %>ms</p>
-          <p><span class="font-semibold">Connect time</span>: <%= @check.connect_time %>ms</p>
-          <p><span class="font-semibold">First byte time</span>: <%= @check.first_byte_time %>ms</p>
-          <p><span class="font-semibold">Total time</span>: <%= @check.request_time %>ms</p>
+          <%= if @check.dns_time do %>
+            <p><span class="font-semibold">DNS time</span>: <%= @check.dns_time %>ms</p>
+          <% end %>
+          <%= if @check.connect_time do %>
+            <p><span class="font-semibold">Connect time</span>: <%= @check.connect_time %>ms</p>
+          <% end %>
+          <%= if @check.tls_time do %>
+            <p><span class="font-semibold">TLS time</span>: <%= @check.tls_time %>ms</p>
+          <% end %>
+          <%= if @check.first_byte_time do %>
+            <p><span class="font-semibold">First byte time</span>: <%= @check.first_byte_time %>ms</p>
+          <% end %>
+          <%= if @check.request_time do %>
+            <p><span class="font-semibold">Total time</span>: <%= @check.request_time %>ms</p>
+          <% end %>
         </div>
       </.hover_card_content>
     </.hover_card>

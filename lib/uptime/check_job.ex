@@ -6,7 +6,7 @@ defmodule Uptime.CheckJob do
   alias Uptime.Service
 
   @impl Oban.Worker
-  def perform(%Oban.Job{args: %{"id" => id}, scheduled_at: scheduled_at}) do
+  def perform(%Oban.Job{args: %{"id" => id} = args, scheduled_at: scheduled_at}) do
     started_at = DateTime.utc_now()
 
     case Uptime.get_service!(id) do
@@ -24,13 +24,15 @@ defmodule Uptime.CheckJob do
               connect_time: result.connected,
               tls_time: result.tls_done,
               first_byte_time: result.first_byte,
-              request_time: result.complete
+              request_time: result.complete,
+              time_since_last_check: time_since_last_check(service, args, started_at)
             })
 
           {:error, :timeout} ->
             Uptime.save_check!(%{
               service_id: service.id,
-              status: :timeout
+              status: :timeout,
+              time_since_last_check: time_since_last_check(service, args, started_at)
             })
         end
 
@@ -45,7 +47,7 @@ defmodule Uptime.CheckJob do
 
         {:ok, _job} =
           %{id: id}
-          |> Uptime.CheckJob.new(scheduled_at: schedule_at)
+          |> Uptime.CheckJob.new(scheduled_at: schedule_at, previous_started_at: started_at)
           |> Oban.insert()
 
         :ok
@@ -55,5 +57,17 @@ defmodule Uptime.CheckJob do
     end
 
     :ok
+  end
+
+  defp time_since_last_check(service, args, started_at) do
+    case args["previous_started_at"] do
+      nil ->
+        service.interval_ms
+
+      previous_started_at ->
+        {:ok, previous_started_at, 0} = DateTime.from_iso8601(previous_started_at)
+
+        DateTime.diff(started_at, previous_started_at, :millisecond)
+    end
   end
 end

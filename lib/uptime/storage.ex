@@ -53,6 +53,28 @@ defmodule Uptime.Storage do
     )
   end
 
+  def service_chart_history(service, start_date, end_date) do
+    # TODO: missing data points
+    # TODO: percent successful requests count(status = 'success' OR NULL)/count(1),
+    query =
+      from c in Check,
+        select: %{
+          week: fragment("date_trunc('week', ?)", c.inserted_at),
+          dns_time: sum(c.dns_time * c.time_since_last_check) / sum(c.time_since_last_check),
+          connect_time: sum((c.connect_time - c.dns_time) * c.time_since_last_check) / sum(c.time_since_last_check),
+          tls_time: sum((c.tls_time - c.connect_time) * c.time_since_last_check) / sum(c.time_since_last_check),
+          first_byte_time: sum((c.first_byte_time - c.tls_time) * c.time_since_last_check) / sum(c.time_since_last_check),
+          request_time: sum((c.request_time - c.first_byte_time) * c.time_since_last_check) / sum(c.time_since_last_check)
+        },
+        where: c.service_id == ^service.id,
+        where: c.inserted_at >= ^start_date,
+        where: c.inserted_at <= ^end_date,
+        group_by: 1,
+        order_by: 1
+
+    Repo.all(query)
+  end
+
   ###
   ### Checks
   ###

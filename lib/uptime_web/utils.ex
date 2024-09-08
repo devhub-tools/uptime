@@ -3,6 +3,9 @@ defmodule UptimeWeb.Utils do
   Utility functions for UptimeWeb.
   """
 
+  def ok(socket), do: {:ok, socket}
+  def noreply(socket), do: {:noreply, socket}
+
   @doc """
   Calculate limit of checks to display.
 
@@ -17,6 +20,6 @@ defmodule UptimeWeb.Utils do
     |> Decimal.from_float()
     |> Decimal.round(0)
     |> Decimal.to_integer()
-    |> max(20)
+    |> max(30)
   end
 end

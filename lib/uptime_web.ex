@@ -91,6 +91,7 @@ defmodule UptimeWeb do
       # Core UI components and translation
       import UptimeWeb.CoreComponents
       import UptimeWeb.FormComponents
+      import UptimeWeb.Utils
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
