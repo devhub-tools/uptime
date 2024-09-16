@@ -8,27 +8,27 @@ defmodule UptimeWeb.BadgeController do
 
   def uptime(conn, %{"slug" => _slug, "duration" => duration}) do
     # TODO: Get uptime value from the service
-    # service = Storage.get_service_by_slug!(slug)
+    # service = Storage.get_service!(slug: slug)
 
     conn
+    |> assign(:type, :uptime)
     |> assign(:uptime, 0.90)
     |> assign(:duration, duration)
-    |> BadgeComponents.uptime()
     |> svg()
   end
 
   def response_time(conn, %{"slug" => _slug, "duration" => duration}) do
     conn
+    |> assign(:type, :latency)
     |> assign(:average_response_time, 170)
     |> assign(:duration, duration)
-    |> BadgeComponents.response_time()
     |> svg()
   end
 
   def health(conn, %{"slug" => _slug}) do
     conn
+    |> assign(:type, :health)
     |> assign(:up, true)
-    |> BadgeComponents.health()
     |> svg()
   end
 

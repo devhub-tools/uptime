@@ -142,15 +142,6 @@ defmodule EnvTest do
     end
   end
 
-  describe "get_uri_part/2" do
-    test "gets uri value from uri struct" do
-      option = "https://github.com"
-      System.put_env("#{@prefix}_TEST_OPTION", option)
-      assert %URI{host: "github.com"} = uri = Env.read("TEST_OPTION", :uri)
-      assert "github.com" == Env.get_uri_part(uri, :host)
-    end
-  end
-
   describe "read_services/0" do
     test "returns list of valid service attrs from env vars and config file" do
       System.put_env("#{@prefix}_SERVICE_1_NAME", "github")

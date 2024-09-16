@@ -12,36 +12,16 @@ defmodule Uptime do
   ###
   ### Services
   ###
-  @callback get_service!(String.t()) :: Service.t()
-  @callback get_service!(String.t(), Keyword.t()) :: Service.t()
-  def get_service!(id, opts \\ []) do
-    Storage.get_service!(id, opts)
-  end
-
-  @callback get_service_by_slug!(String.t()) :: Service.t()
-  @callback get_service_by_slug!(String.t(), Keyword.t()) :: Service.t()
-  def get_service_by_slug!(slug, opts \\ []) do
-    Storage.get_service_by_slug!(slug, opts)
+  @callback get_service!(Keyword.t()) :: Service.t()
+  @callback get_service!(Keyword.t(), Keyword.t()) :: Service.t()
+  def get_service!(by, opts \\ []) do
+    Storage.get_service!(by, opts)
   end
 
   @callback list_services() :: [Service.t()]
   @callback list_services(Keyword.t()) :: [Service.t()]
   def list_services(opts \\ []) do
     Storage.list_services(opts)
-  end
-
-  def service_history_chart(service, start_date, end_date) do
-    Charts.service_history(service, start_date, end_date)
-  end
-
-  ###
-  ### Checks
-  ###
-  @callback save_check!(map()) :: Uptime.Check.t()
-  def save_check!(attrs) do
-    attrs
-    |> Storage.save_check!()
-    |> tap(&broadcast!/1)
   end
 
   @callback save_service(map()) :: {:ok, Uptime.Service.t()} | {:error, Ecto.Changeset.t()}
@@ -54,6 +34,21 @@ defmodule Uptime do
       error ->
         error
     end
+  end
+
+  @callback service_history_chart(Uptime.Service.t(), DateTime.t(), DateTime.t()) :: map()
+  def service_history_chart(service, start_date, end_date) do
+    Charts.service_history(service, start_date, end_date)
+  end
+
+  ###
+  ### Checks
+  ###
+  @callback save_check!(map()) :: Uptime.Check.t()
+  def save_check!(attrs) do
+    attrs
+    |> Storage.save_check!()
+    |> tap(&broadcast!/1)
   end
 
   ###
