@@ -10,6 +10,7 @@ defmodule UptimeWeb.Router do
   @csp_img_src "img-src data: w3.org/svg/2000 'self'"
   @csp_font_src "font-src 'self' fonts.gstatic.com"
   @csp_style_src "style-src 'self' fonts.googleapis.com"
+
   if Env.config_env() == :dev do
     @csp_style_src @csp_style_src <> " 'unsafe-inline'"
   end
@@ -35,16 +36,10 @@ defmodule UptimeWeb.Router do
     plug :put_secure_browser_headers, %{"content-security-policy" => @csp}
   end
 
-  # scope "/v1/api", UptimeWeb do
-  #   pipe_through :api
-  # end
-
-  scope "/v1/badges", UptimeWeb do
-    pipe_through :badges
-
-    get "/services/:slug/uptimes/:duration/badge.svg", BadgeController, :uptime
-    get "/services/:slug/times/:duration/badge.svg", BadgeController, :response_time
-    get "/services/:slug/health/badge.svg", BadgeController, :health
+  scope "/v1/services", UptimeWeb do
+    get "/:slug/uptime/:duration/badge.svg", BadgeController, :uptime
+    get "/:slug/latency/:duration/badge.svg", BadgeController, :response_time
+    get "/:slug/health/badge.svg", BadgeController, :health
   end
 
   scope "/", UptimeWeb do

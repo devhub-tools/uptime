@@ -24,34 +24,34 @@ defmodule UptimeWeb.BadgeComponents do
     |> Decimal.from_float()
     |> Decimal.round(0)
     |> Decimal.to_string()
-    |> then(&assignp(conn_or_assigns, :value, &1 <> "%"))
-    |> assignp(:label_width, 70)
-    |> then(&assignp(&1, :value_width, String.length(get(&1, :value)) * 11))
-    |> assignp(:color, uptime_color(get(conn_or_assigns, :uptime)))
-    |> assignp(:label, "uptime #{get(conn_or_assigns, :duration)}")
-    |> assignp(:id, "uptime")
+    |> then(&flex_assign(conn_or_assigns, :value, &1 <> "%"))
+    |> flex_assign(:label_width, 70)
+    |> then(&flex_assign(&1, :value_width, String.length(get(&1, :value)) * 11))
+    |> flex_assign(:color, uptime_color(get(conn_or_assigns, :uptime)))
+    |> flex_assign(:label, "uptime #{get(conn_or_assigns, :duration)}")
+    |> flex_assign(:id, "uptime")
     |> render_component()
   end
 
   def response_time(conn_or_assigns) do
     conn_or_assigns
-    |> assignp(:value, Integer.to_string(get(conn_or_assigns, :average_response_time)) <> "ms")
-    |> assignp(:label_width, 105)
-    |> then(&assignp(&1, :value_width, String.length(get(&1, :value)) * 11))
-    |> assignp(:color, response_time_color(get(conn_or_assigns, :average_response_time)))
-    |> assignp(:label, "response time #{get(conn_or_assigns, :duration)}")
-    |> assignp(:id, "response")
+    |> flex_assign(:value, Integer.to_string(get(conn_or_assigns, :average_response_time)) <> "ms")
+    |> flex_assign(:label_width, 105)
+    |> then(&flex_assign(&1, :value_width, String.length(get(&1, :value)) * 11))
+    |> flex_assign(:color, response_time_color(get(conn_or_assigns, :average_response_time)))
+    |> flex_assign(:label, "response time #{get(conn_or_assigns, :duration)}")
+    |> flex_assign(:id, "response")
     |> render_component()
   end
 
   def health(conn_or_assigns) do
     conn_or_assigns
-    |> assignp(:label_width, 48)
-    |> assignp(:value_width, (get(conn_or_assigns, :up) && 28) || 44)
-    |> assignp(:color, (get(conn_or_assigns, :up) && @badge_colors.excellent) || @badge_colors.very_bad)
-    |> assignp(:label, "health")
-    |> assignp(:value, (get(conn_or_assigns, :up) && "up") || "down")
-    |> assignp(:id, "health")
+    |> flex_assign(:label_width, 48)
+    |> flex_assign(:value_width, (get(conn_or_assigns, :up) && 28) || 44)
+    |> flex_assign(:color, (get(conn_or_assigns, :up) && @badge_colors.excellent) || @badge_colors.very_bad)
+    |> flex_assign(:label, "health")
+    |> flex_assign(:value, (get(conn_or_assigns, :up) && "up") || "down")
+    |> flex_assign(:id, "health")
     |> render_component()
   end
 
@@ -108,11 +108,11 @@ defmodule UptimeWeb.BadgeComponents do
     """
   end
 
-  defp assignp(%Plug.Conn{} = conn, key, value) do
+  defp flex_assign(%Plug.Conn{} = conn, key, value) do
     Plug.Conn.assign(conn, key, value)
   end
 
-  defp assignp(%{__changed__: _changed} = assigns, key, value) do
+  defp flex_assign(%{__changed__: _changed} = assigns, key, value) do
     Phoenix.Component.assign(assigns, key, value)
   end
 

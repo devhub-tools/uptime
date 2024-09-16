@@ -19,6 +19,9 @@ defmodule Uptime.Env do
 
   @secrets_directory Application.compile_env(:uptime, :supported_secrets_dir, "/etc/secrets")
 
+  @type value_type :: :string | :integer | :boolean | :uri | :cors
+  @type config_type :: String.t() | integer() | boolean() | URI.t() | [String.t()] | nil | any()
+
   @spec config_env() :: :prod | :dev | :test
   def config_env, do: @config_env
 
@@ -46,59 +49,10 @@ defmodule Uptime.Env do
   @spec get(atom(), any()) :: any()
   def get(key, default \\ nil), do: Application.get_env(:uptime, key, default)
 
-  @spec read(String.t(), Keyword.t()) :: [map()]
+  @spec read_services() :: [map()]
   def read_services do
     read_services_from_env() ++ read_services_from_config_file()
   end
-
-  defp read_services_from_config_file do
-    "services"
-    |> read_from_config_file()
-    |> case do
-      {:ok, services} -> services
-      _error -> []
-    end
-    |> Enum.map(fn service ->
-      service
-      |> Map.new(fn {k, v} -> {String.downcase(k), v} end)
-      |> Map.new(fn
-        {"expected_status_code" = k, v} when is_integer(v) -> {k, Integer.to_string(v)}
-        pair -> pair
-      end)
-    end)
-  end
-
-  defp read_services_from_env do
-    System.get_env()
-    |> Map.keys()
-    |> Enum.filter(&String.starts_with?(String.upcase(&1), "#{@prefix}_SERVICE_"))
-    |> Enum.group_by(
-      fn var ->
-        var
-        |> String.split("_")
-        |> case do
-          [@prefix, "SERVICE", index | _name] -> @prefix <> "_SERVICE_" <> index
-          _invalid -> nil
-        end
-      end,
-      fn var ->
-        var
-        |> String.split("_")
-        |> case do
-          [@prefix, "SERVICE", _index | name] -> Enum.join(name, "_")
-          _invalid -> nil
-        end
-      end
-    )
-    |> Enum.reject(&is_nil/1)
-    |> Enum.map(fn
-      {service_prefix, fields} ->
-        Map.new(fields, fn field -> {String.downcase(field), System.get_env("#{service_prefix}_#{field}")} end)
-    end)
-  end
-
-  @type value_type :: :string | :integer | :boolean | :uri | :cors
-  @type config_type :: String.t() | integer() | boolean() | URI.t() | [String.t()] | nil | any()
 
   @doc """
   Read a value from the environment.
@@ -159,11 +113,10 @@ defmodule Uptime.Env do
   defp parse_value(value, :integer) when is_integer(value), do: value
   defp parse_value(value, :integer), do: String.to_integer(value)
 
-  defp parse_value(value, :boolean) when value in [1, true], do: true
-  defp parse_value(value, :boolean) when value in [0, false], do: false
-
   defp parse_value(value, :boolean) do
     cond do
+      value in [true, 1] -> true
+      value in [false, 0] -> false
       String.downcase(value) in ~w(true 1) -> true
       String.downcase(value) in ~w(false 0) -> false
       true -> nil
@@ -174,9 +127,49 @@ defmodule Uptime.Env do
   defp parse_value("", :uri), do: nil
   defp parse_value(value, :uri), do: URI.parse(value)
 
-  @spec get_uri_part(URI.t() | any(), :scheme | :host | :port) :: String.t() | nil
-  def get_uri_part(%URI{scheme: scheme}, :scheme), do: scheme
-  def get_uri_part(%URI{host: host}, :host), do: host
-  def get_uri_part(%URI{port: port}, :port), do: port
-  def get_uri_part(_invalid, _part), do: nil
+  defp read_services_from_config_file do
+    "services"
+    |> read_from_config_file()
+    |> case do
+      {:ok, services} -> services
+      _error -> []
+    end
+    |> Enum.map(fn service ->
+      service
+      |> Map.new(fn {k, v} -> {String.downcase(k), v} end)
+      |> Map.new(fn
+        {"expected_status_code" = k, v} when is_integer(v) -> {k, Integer.to_string(v)}
+        pair -> pair
+      end)
+    end)
+  end
+
+  defp read_services_from_env do
+    System.get_env()
+    |> Map.keys()
+    |> Enum.filter(&String.starts_with?(String.upcase(&1), "#{@prefix}_SERVICE_"))
+    |> Enum.group_by(
+      fn var ->
+        var
+        |> String.split("_")
+        |> case do
+          [@prefix, "SERVICE", index | _name] -> @prefix <> "_SERVICE_" <> index
+          _invalid -> nil
+        end
+      end,
+      fn var ->
+        var
+        |> String.split("_")
+        |> case do
+          [@prefix, "SERVICE", _index | name] -> Enum.join(name, "_")
+          _invalid -> nil
+        end
+      end
+    )
+    |> Enum.reject(&is_nil/1)
+    |> Enum.map(fn
+      {service_prefix, fields} ->
+        Map.new(fields, fn field -> {String.downcase(field), System.get_env("#{service_prefix}_#{field}")} end)
+    end)
+  end
 end

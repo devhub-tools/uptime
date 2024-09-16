@@ -12,16 +12,10 @@ defmodule Uptime do
   ###
   ### Services
   ###
-  @callback get_service!(String.t()) :: Service.t()
-  @callback get_service!(String.t(), Keyword.t()) :: Service.t()
-  def get_service!(id, opts \\ []) do
-    Storage.get_service!(id, opts)
-  end
-
-  @callback get_service_by_slug!(String.t()) :: Service.t()
-  @callback get_service_by_slug!(String.t(), Keyword.t()) :: Service.t()
-  def get_service_by_slug!(slug, opts \\ []) do
-    Storage.get_service_by_slug!(slug, opts)
+  @callback get_service!(Keyword.t()) :: Service.t()
+  @callback get_service!(Keyword.t(), Keyword.t()) :: Service.t()
+  def get_service!(by, opts \\ []) do
+    Storage.get_service!(by, opts)
   end
 
   @callback list_services() :: [Service.t()]

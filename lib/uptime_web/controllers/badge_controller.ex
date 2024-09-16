@@ -8,7 +8,7 @@ defmodule UptimeWeb.BadgeController do
 
   def uptime(conn, %{"slug" => _slug, "duration" => duration}) do
     # TODO: Get uptime value from the service
-    # service = Storage.get_service_by_slug!(slug)
+    # service = Storage.get_service!(slug: slug)
 
     conn
     |> assign(:uptime, 0.90)

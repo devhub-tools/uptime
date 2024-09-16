@@ -14,7 +14,7 @@ defmodule UptimeWeb.ServiceLive do
 
   def mount(%{"slug" => slug}, _session, socket) do
     initial_check_limit = 50
-    service = Uptime.get_service_by_slug!(slug, enabled: true, preload_checks: true, limit_checks: initial_check_limit)
+    service = Uptime.get_service!(slug: slug, enabled: true, preload_checks: true, limit_checks: initial_check_limit)
 
     socket
     |> assign(
@@ -107,8 +107,8 @@ defmodule UptimeWeb.ServiceLive do
     check_limit = values |> Map.get("width", 800) |> Utils.calculate_checks_limit()
 
     service =
-      Uptime.get_service_by_slug!(
-        socket.assigns.slug,
+      Uptime.get_service!(
+        slug: socket.assigns.slug,
         enabled: true,
         preload_checks: true,
         limit_checks: check_limit

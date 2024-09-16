@@ -38,6 +38,8 @@ defmodule UptimeWeb.DashboardLive do
 
   def render(assigns) do
     ~H"""
+    <.icon name="hero-plus" class="w-8 h-8 text-gray-400" />
+    <p>hello</p>
     <div id="window-resize" phx-hook="WindowResize" class="space-y-6">
       <%= for service <- @services do %>
         <.service_checks_summary
