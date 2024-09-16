@@ -46,8 +46,8 @@ defmodule Uptime.CheckJob do
           end
 
         {:ok, _job} =
-          %{id: id}
-          |> Uptime.CheckJob.new(scheduled_at: schedule_at, previous_started_at: started_at)
+          %{id: id, previous_started_at: started_at}
+          |> Uptime.CheckJob.new(scheduled_at: schedule_at)
           |> Oban.insert()
 
         :ok

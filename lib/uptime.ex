@@ -24,6 +24,19 @@ defmodule Uptime do
     Storage.list_services(opts)
   end
 
+  @callback save_service(map()) :: {:ok, Uptime.Service.t()} | {:error, Ecto.Changeset.t()}
+  def save_service(attrs) do
+    case Storage.save_service(attrs) do
+      {:ok, service} ->
+        %{id: service.id} |> CheckJob.new(scheduled_at: DateTime.utc_now()) |> Oban.insert()
+        {:ok, service}
+
+      error ->
+        error
+    end
+  end
+
+  @callback service_history_chart(Uptime.Service.t(), DateTime.t(), DateTime.t()) :: map()
   def service_history_chart(service, start_date, end_date) do
     Charts.service_history(service, start_date, end_date)
   end
@@ -36,18 +49,6 @@ defmodule Uptime do
     attrs
     |> Storage.save_check!()
     |> tap(&broadcast!/1)
-  end
-
-  @callback save_service(map()) :: {:ok, Uptime.Service.t()} | {:error, Ecto.Changeset.t()}
-  def save_service(attrs) do
-    case Storage.save_service(attrs) do
-      {:ok, service} ->
-        %{id: service.id} |> CheckJob.new(scheduled_at: DateTime.utc_now()) |> Oban.insert()
-        {:ok, service}
-
-      error ->
-        error
-    end
   end
 
   ###
