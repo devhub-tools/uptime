@@ -48,18 +48,18 @@ defmodule UptimeWeb.ServiceLive do
         <.back navigate={~p"/"} text="View all" />
         <div class="flex flex-row flex-wrap space-x-4">
           <div>
-            <.link href={"/v1/badges/services/#{@service.slug}/uptimes/#{"7d"}/badge.svg"}>
-              <.uptime duration="7d" uptime={0.90} />
+            <.link href={"/v1/services/#{@service.slug}/uptime/#{"7d"}/badge.svg"}>
+              <.badge type={:uptime} duration="7d" uptime={0.90} />
             </.link>
           </div>
           <div>
-            <.link href={"/v1/badges/services/#{@service.slug}/times/#{"7d"}/badge.svg"}>
-              <.response_time duration="7d" average_response_time={170} />
+            <.link href={"/v1/services/#{@service.slug}/latency/#{"7d"}/badge.svg"}>
+              <.badge type={:latency} duration="7d" average_response_time={170} />
             </.link>
           </div>
           <div>
-            <.link href={"/v1/badges/services/#{@service.slug}/health/badge.svg"}>
-              <.health up={latest_checks_success(@service.checks)} />
+            <.link href={"/v1/services/#{@service.slug}/health/badge.svg"}>
+              <.badge type={:health} up={latest_checks_success(@service.checks)} />
             </.link>
           </div>
         </div>

@@ -19,57 +19,21 @@ defmodule UptimeWeb.BadgeComponents do
     very_bad: "#c7130a"
   }
 
-  def uptime(conn_or_assigns) do
-    (get(conn_or_assigns, :uptime) * 100)
-    |> Decimal.from_float()
-    |> Decimal.round(0)
-    |> Decimal.to_string()
-    |> then(&flex_assign(conn_or_assigns, :value, &1 <> "%"))
-    |> flex_assign(:label_width, 70)
-    |> then(&flex_assign(&1, :value_width, String.length(get(&1, :value)) * 11))
-    |> flex_assign(:color, uptime_color(get(conn_or_assigns, :uptime)))
-    |> flex_assign(:label, "uptime #{get(conn_or_assigns, :duration)}")
-    |> flex_assign(:id, "uptime")
-    |> render_component()
-  end
-
-  def response_time(conn_or_assigns) do
-    conn_or_assigns
-    |> flex_assign(:value, Integer.to_string(get(conn_or_assigns, :average_response_time)) <> "ms")
-    |> flex_assign(:label_width, 105)
-    |> then(&flex_assign(&1, :value_width, String.length(get(&1, :value)) * 11))
-    |> flex_assign(:color, response_time_color(get(conn_or_assigns, :average_response_time)))
-    |> flex_assign(:label, "response time #{get(conn_or_assigns, :duration)}")
-    |> flex_assign(:id, "response")
-    |> render_component()
-  end
-
-  def health(conn_or_assigns) do
-    conn_or_assigns
-    |> flex_assign(:label_width, 48)
-    |> flex_assign(:value_width, (get(conn_or_assigns, :up) && 28) || 44)
-    |> flex_assign(:color, (get(conn_or_assigns, :up) && @badge_colors.excellent) || @badge_colors.very_bad)
-    |> flex_assign(:label, "health")
-    |> flex_assign(:value, (get(conn_or_assigns, :up) && "up") || "down")
-    |> flex_assign(:id, "health")
-    |> render_component()
-  end
-
-  # Render the component when running as a component, or return the conn for controller.
-  defp render_component(%Plug.Conn{} = conn), do: conn
-  defp render_component(%{__changed__: _changed} = assigns), do: badge(assigns)
-
   @doc """
   The svg is both a view for the badge controller and can also be rendered as a component.
   """
   def badge(assigns) do
+    assigns = default_assigns(assigns, assigns.type)
+    id = to_string(assigns.type)
+
     assigns =
       assigns
       |> Map.put(:label_x, assigns.label_width / 2)
       |> Map.put(:value_x, assigns.label_width + assigns.value_width / 2)
       |> Map.put(:width, assigns.label_width + assigns.value_width)
-      |> Map.put(:id_mask, assigns.id <> "-mask")
-      |> Map.put(:id_gradient, assigns.id <> "-gradient")
+      |> Map.put(:id, id)
+      |> Map.put(:id_mask, id <> "-mask")
+      |> Map.put(:id_gradient, id <> "-gradient")
 
     ~H"""
     <svg xmlns="http://www.w3.org/2000/svg" width={@width} height="20">
@@ -108,20 +72,40 @@ defmodule UptimeWeb.BadgeComponents do
     """
   end
 
-  defp flex_assign(%Plug.Conn{} = conn, key, value) do
-    Plug.Conn.assign(conn, key, value)
+  defp default_assigns(assigns, :uptime) do
+    value =
+      (assigns[:uptime] * 100)
+      |> Decimal.from_float()
+      |> Decimal.round(0)
+      |> Decimal.to_string()
+      |> Kernel.<>("%")
+
+    assigns
+    |> Map.put(:value, value)
+    |> Map.put(:label_width, 70)
+    |> Map.put(:value_width, String.length(value) * 11)
+    |> Map.put(:color, uptime_color(assigns[:uptime]))
+    |> Map.put(:label, "uptime #{assigns[:duration]}")
   end
 
-  defp flex_assign(%{__changed__: _changed} = assigns, key, value) do
-    Phoenix.Component.assign(assigns, key, value)
+  defp default_assigns(assigns, :latency) do
+    value = Integer.to_string(assigns[:average_response_time]) <> "ms"
+
+    assigns
+    |> Map.put(:value, value)
+    |> Map.put(:label_width, 105)
+    |> Map.put(:value_width, String.length(value) * 11)
+    |> Map.put(:color, response_time_color(assigns[:average_response_time]))
+    |> Map.put(:label, "response time #{assigns[:duration]}")
   end
 
-  defp get(%Plug.Conn{} = conn, key) do
-    conn.assigns[key]
-  end
-
-  defp get(%{__changed__: _changed} = assigns, key) do
-    assigns[key]
+  defp default_assigns(assigns, :health) do
+    assigns
+    |> Map.put(:label_width, 48)
+    |> Map.put(:value_width, (assigns[:up] && 28) || 44)
+    |> Map.put(:color, (assigns[:up] && @badge_colors.excellent) || @badge_colors.very_bad)
+    |> Map.put(:label, "health")
+    |> Map.put(:value, (assigns[:up] && "up") || "down")
   end
 
   defp uptime_color(uptime) do
