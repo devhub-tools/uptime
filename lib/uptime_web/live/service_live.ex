@@ -14,7 +14,7 @@ defmodule UptimeWeb.ServiceLive do
 
   def mount(%{"slug" => slug}, _session, socket) do
     initial_check_limit = 50
-    service = Uptime.get_service_by_slug!(slug, enabled: true, preload_checks: true, limit_checks: initial_check_limit)
+    service = Uptime.get_service!([slug: slug], enabled: true, preload_checks: true, limit_checks: initial_check_limit)
 
     socket
     |> assign(
@@ -48,18 +48,18 @@ defmodule UptimeWeb.ServiceLive do
         <.back navigate={~p"/"} text="View all" />
         <div class="flex flex-row flex-wrap space-x-4">
           <div>
-            <.link href={"/v1/badges/services/#{@service.slug}/uptimes/#{"7d"}/badge.svg"}>
-              <.uptime duration="7d" uptime={0.90} />
+            <.link href={"/v1/services/#{@service.slug}/uptime/#{"7d"}/badge.svg"}>
+              <.badge type={:uptime} duration="7d" uptime={0.90} />
             </.link>
           </div>
           <div>
-            <.link href={"/v1/badges/services/#{@service.slug}/times/#{"7d"}/badge.svg"}>
-              <.response_time duration="7d" average_response_time={170} />
+            <.link href={"/v1/services/#{@service.slug}/latency/#{"7d"}/badge.svg"}>
+              <.badge type={:latency} duration="7d" average_response_time={170} />
             </.link>
           </div>
           <div>
-            <.link href={"/v1/badges/services/#{@service.slug}/health/badge.svg"}>
-              <.health up={latest_checks_success(@service.checks)} />
+            <.link href={"/v1/services/#{@service.slug}/health/badge.svg"}>
+              <.badge type={:health} up={latest_checks_success(@service.checks)} />
             </.link>
           </div>
         </div>
@@ -107,8 +107,8 @@ defmodule UptimeWeb.ServiceLive do
     check_limit = values |> Map.get("width", 800) |> Utils.calculate_checks_limit()
 
     service =
-      Uptime.get_service_by_slug!(
-        socket.assigns.slug,
+      Uptime.get_service!(
+        [slug: socket.assigns.slug],
         enabled: true,
         preload_checks: true,
         limit_checks: check_limit

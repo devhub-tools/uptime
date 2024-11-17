@@ -11,6 +11,7 @@ defmodule Uptime.Charts do
     finish: "hsl(27 87% 67%)"
   }
 
+  @spec service_history(Uptime.Service.t(), DateTime.t(), DateTime.t()) :: map()
   def service_history(service, start_date, end_date) do
     data = Storage.service_chart_history(service, start_date, end_date)
 

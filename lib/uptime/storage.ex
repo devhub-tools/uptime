@@ -13,20 +13,11 @@ defmodule Uptime.Storage do
   ###
   ### Services
   ###
-  @callback get_service!(String.t(), Keyword.t()) :: Service.t()
-  def get_service!(id, opts) do
+  @callback get_service!(Keyword.t(), Keyword.t()) :: Service.t()
+  def get_service!(by, opts) do
     %{preload_checks: preload_checks, limit_checks: limit_checks} = service_query_opts(opts)
 
-    from(s in Service, where: s.id == ^id)
-    |> maybe_preload_checks(preload_checks, limit_checks)
-    |> Repo.one!()
-  end
-
-  @callback get_service_by_slug!(String.t(), Keyword.t()) :: Service.t()
-  def get_service_by_slug!(slug, opts) do
-    %{preload_checks: preload_checks, limit_checks: limit_checks} = service_query_opts(opts)
-
-    from(s in Service, where: s.slug == ^slug)
+    from(s in Service, where: ^by)
     |> maybe_preload_checks(preload_checks, limit_checks)
     |> Repo.one!()
   end
@@ -49,7 +40,7 @@ defmodule Uptime.Storage do
     |> Repo.insert(
       on_conflict: {:replace_all_except, [:id, :inserted_at]},
       conflict_target: :slug,
-      returning: false
+      returning: true
     )
   end
 

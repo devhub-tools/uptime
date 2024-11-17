@@ -6,9 +6,9 @@ defmodule UptimeTest do
   test "get_service!/2" do
     %{id: service_id} = service = build(:service)
 
-    expect(Mock, :get_service!, fn ^service_id, [] -> service end)
+    expect(Mock, :get_service!, fn [id: ^service_id], [] -> service end)
 
-    assert service == Uptime.get_service!(service.id)
+    assert service == Uptime.get_service!(id: service.id)
   end
 
   test "list_services/1" do

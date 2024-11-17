@@ -30,6 +30,7 @@ defmodule Uptime.Factory do
       tls_time: 30,
       first_byte_time: 40,
       request_time: 100,
+      time_since_last_check: 10_000,
       inserted_at: DateTime.utc_now(),
       updated_at: DateTime.utc_now()
     }
